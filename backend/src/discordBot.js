@@ -2,7 +2,6 @@ import { Client, GatewayIntentBits, Partials, REST, Routes, ActionRowBuilder, Bu
 import { humanPost } from './services/humanizer.js';
 import { generateAnnouncement } from './services/announcer.js';
 import { getRedisClient } from './services/redisClient.js';
-import fetch from 'node-fetch';
 
 const FALLBACK_STYLE = 'Professional, confident, concise crypto-native tone.';
 
@@ -26,31 +25,13 @@ function getQueryChannelId() {
   return (process.env.QUERY_CHANNEL_ID || process.env.COMMAND_CHANNEL_ID || '').trim();
 }
 
-function getAutoCooldownMs() {
-  return Number(process.env.AUTO_COOLDOWN_MS || 3_600_000);
-}
-
-function getAutoTopics() {
-  const topics = splitCsv(process.env.AUTO_TOPICS || 'Latest project update');
-  return topics.length ? topics : ['Latest project update'];
-}
-
 function getDefaultStyle() {
   return process.env.DEFAULT_STYLE || FALLBACK_STYLE;
 }
 
-function getKillSwitchFlag() {
-  return process.env.KILL_SWITCH === 'true';
-}
-
 const MAX_SLASH_INPUT_LENGTH = 1500;
 
-let AUTO_MODE = false;
-let KILL_SWITCH = false;
 let STYLE_MEMORY = FALLBACK_STYLE;
-let LAST_AUTO_POST_TIME = Date.now();
-let autoLoopTimer = null;
-let autoTopicIndex = 0;
 
 // --- Approval flow state ---
 let APPROVAL_MODE = true; // when true, webhook posts require admin approval
@@ -142,32 +123,8 @@ const SLASH_COMMANDS = [
     description: 'Re-draft announcement from the last Metricool post received via Zapier',
   },
   {
-    name: 'auto',
-    description: 'Toggle autonomous posting mode',
-    options: [
-      {
-        name: 'state',
-        description: 'on or off',
-        type: 3, // STRING
-        required: true,
-        choices: [
-          { name: 'on', value: 'on' },
-          { name: 'off', value: 'off' },
-        ],
-      },
-    ],
-  },
-  {
-    name: 'kill',
-    description: 'Emergency stop - disable all auto-posting immediately',
-  },
-  {
-    name: 'unkill',
-    description: 'Re-enable auto-posting after a kill switch',
-  },
-  {
     name: 'status',
-    description: 'Show current bot status (auto mode, kill switch, approval mode)',
+    description: 'Show current bot status (approval mode, channels, style)',
   },
   {
     name: 'approve',
@@ -346,41 +303,6 @@ async function handleInteraction(interaction, logger) {
     return;
   }
 
-  // /auto
-  if (commandName === 'auto') {
-    if (!isAdmin(interaction.user.id)) {
-      return interaction.reply({ content: 'Unauthorized.', flags: MessageFlags.Ephemeral });
-    }
-    const state = interaction.options.getString('state');
-    if (state === 'on' && KILL_SWITCH) {
-      return interaction.reply({ content: 'Kill switch is active. Use /unkill first.', flags: MessageFlags.Ephemeral });
-    }
-    AUTO_MODE = state === 'on';
-    logger?.info?.({ autoMode: AUTO_MODE }, 'auto mode toggled');
-    return interaction.reply({ content: `Auto mode ${AUTO_MODE ? 'enabled' : 'disabled'}.`, flags: MessageFlags.Ephemeral });
-  }
-
-  // /kill
-  if (commandName === 'kill') {
-    if (!isAdmin(interaction.user.id)) {
-      return interaction.reply({ content: 'Unauthorized.', flags: MessageFlags.Ephemeral });
-    }
-    KILL_SWITCH = true;
-    AUTO_MODE = false;
-    logger?.info?.('kill switch activated');
-    return interaction.reply({ content: 'Kill switch activated. All auto-posting disabled.', flags: MessageFlags.Ephemeral });
-  }
-
-  // /unkill
-  if (commandName === 'unkill') {
-    if (!isAdmin(interaction.user.id)) {
-      return interaction.reply({ content: 'Unauthorized.', flags: MessageFlags.Ephemeral });
-    }
-    KILL_SWITCH = false;
-    logger?.info?.('kill switch deactivated');
-    return interaction.reply({ content: 'Kill switch deactivated. You can now use /auto on.', flags: MessageFlags.Ephemeral });
-  }
-
   // /status
   if (commandName === 'status') {
     if (!isAdmin(interaction.user.id)) {
@@ -388,14 +310,12 @@ async function handleInteraction(interaction, logger) {
     }
     const qCh = getQueryChannelId();
     const lines = [
-      `**Auto mode:** ${AUTO_MODE ? 'ON' : 'OFF'}`,
-      `**Kill switch:** ${KILL_SWITCH ? 'ACTIVE' : 'off'}`,
       `**Style:** ${STYLE_MEMORY}`,
       `**Query channel:** ${qCh ? `<#${qCh}>` : 'not configured'}`,
       `**Announce channels:** ${getAnnounceChannels().length || 'none configured'}`,
-      `**Last auto-post:** ${LAST_AUTO_POST_TIME ? new Date(LAST_AUTO_POST_TIME).toISOString() : 'never'}`,
       `**Approval mode:** ${APPROVAL_MODE ? 'ON' : 'OFF'}`,
       `**Pending approvals:** ${pendingApprovals.size}`,
+      `**Last webhook post:** ${lastWebhookPost ? new Date(lastWebhookPost.receivedAt).toISOString() : 'none'}`,
     ];
     return interaction.reply({ content: lines.join('\n'), flags: MessageFlags.Ephemeral });
   }
@@ -444,12 +364,8 @@ async function handleInteraction(interaction, logger) {
       '',
       '**Announcements**',
       '`/announce topic:` - Generate and post an announcement (shows draft first)',
-      '`/draft` - Re-draft announcement from the last Metricool post received via Zapier',
-      '',
-      '**Auto-Posting**',
-      '`/auto on/off` - Toggle autonomous posting',
-      '`/kill` - Emergency stop all auto-posting',
-      '`/unkill` - Re-enable after kill switch',
+      '`/draft` - Re-draft from the last Metricool post received via Zapier',
+      '`/delete count:` - Delete last N bot messages from announce channels',
       '',
       '**Approval**',
       '`/approve on/off/pending` - Toggle webhook approval mode or review pending posts',
@@ -457,7 +373,6 @@ async function handleInteraction(interaction, logger) {
       '**Info**',
       '`/status` - Show bot status',
       '`/ping` - Check if bot is alive',
-      '`/delete count:` - Delete last N bot messages from announce channels',
       '`/help` - This message',
     ];
     return interaction.reply({ content: helpText.join('\n'), flags: MessageFlags.Ephemeral });
@@ -505,42 +420,6 @@ async function handleInteraction(interaction, logger) {
   }
 }
 
-// --- Auto-loop (chained setTimeout to prevent overlap) ---
-function startAutoLoop(bot, logger) {
-  if (autoLoopTimer) return;
-  const scheduleNext = () => {
-    autoLoopTimer = setTimeout(tick, 30_000);
-  };
-  const tick = async () => {
-    if (!AUTO_MODE || KILL_SWITCH) { scheduleNext(); return; }
-    const cooldownMs = getAutoCooldownMs();
-    if (Date.now() - LAST_AUTO_POST_TIME < cooldownMs) { scheduleNext(); return; }
-
-    const topics = getAutoTopics();
-    const topic = topics[autoTopicIndex % topics.length];
-    autoTopicIndex++;
-
-    try {
-      const draft = await generateAnnouncement(topic, STYLE_MEMORY);
-      const posted = await postToAnnounceChannels(draft, logger);
-      LAST_AUTO_POST_TIME = Date.now();
-      logger?.info?.({ topic, channels: posted }, 'auto-post sent');
-    } catch (err) {
-      logger?.error?.({ err }, 'auto-post generation failed');
-    }
-    scheduleNext();
-  };
-  scheduleNext();
-  logger?.info?.('auto-loop started');
-}
-
-function stopAutoLoop() {
-  if (autoLoopTimer) {
-    clearTimeout(autoLoopTimer);
-    autoLoopTimer = null;
-  }
-}
-
 function createClient(logger) {
   const bot = new Client({ intents, partials });
 
@@ -548,7 +427,6 @@ function createClient(logger) {
     logger?.info?.({ bot: bot.user?.tag }, 'discord bot ready');
     await loadStyleMemory(logger);
     await registerSlashCommands(bot, logger);
-    startAutoLoop(bot, logger);
   });
 
   bot.on('interactionCreate', async (interaction) => {
@@ -603,7 +481,6 @@ function createClient(logger) {
 
 function startDiscordGateway({ logger = console } = {}) {
   if (client) return client;
-  KILL_SWITCH = getKillSwitchFlag();
   const token = getDiscordBotToken();
   if (!token) {
     logger?.warn?.('DISCORD_BOT_TOKEN missing; gateway not started');
@@ -620,7 +497,6 @@ function startDiscordGateway({ logger = console } = {}) {
 }
 
 function stopDiscordGateway() {
-  stopAutoLoop();
   if (client) {
     client.destroy();
     client = null;
