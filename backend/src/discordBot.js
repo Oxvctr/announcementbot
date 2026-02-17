@@ -71,6 +71,20 @@ function isAdmin(userId) {
   return getAdminIds().includes(userId);
 }
 
+// Safety: detect AI meta/help responses that should never be posted
+function isMetaResponse(text) {
+  const lower = text.toLowerCase();
+  return (
+    lower.includes('i don\'t see any') ||
+    lower.includes('could you provide') ||
+    lower.includes('i\'m ready to help') ||
+    lower.includes('please provide') ||
+    lower.includes('drop the content') ||
+    lower.includes('share the post') ||
+    lower.includes('once you share')
+  );
+}
+
 // --- Post to announce channels (used by webhook + slash commands) ---
 async function postToAnnounceChannels(text, logger, { url } = {}) {
   if (!client) {
@@ -236,6 +250,10 @@ async function handleInteraction(interaction, logger) {
       });
 
       if (btnInteraction.customId === 'announce_post') {
+        if (isMetaResponse(draft)) {
+          await btnInteraction.update({ content: 'Blocked: AI produced a meta/help response instead of an announcement. Try again with more specific input.', components: [] });
+          return;
+        }
         const posted = await postToAnnounceChannels(draft, logger);
         await btnInteraction.update({ content: `Posted to ${posted} channel(s).`, components: [] });
         logger?.info?.({ topic, channels: posted }, 'announcement posted');
@@ -291,6 +309,10 @@ async function handleInteraction(interaction, logger) {
         time: 300_000,
       });
       if (btnInteraction.customId === 'draft_post') {
+        if (isMetaResponse(draft)) {
+          await btnInteraction.update({ content: 'Blocked: AI produced a meta/help response instead of an announcement. Try again.', components: [] });
+          return;
+        }
         const posted = await postToAnnounceChannels(draft, logger, { url: lastWebhookPost.url });
         await btnInteraction.update({ content: `Posted to ${posted} channel(s).`, components: [] });
         logger?.info?.({ channels: posted }, 'draft posted');

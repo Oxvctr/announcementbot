@@ -49,6 +49,8 @@ export async function generateAnnouncement(topic, styleMemory) {
     '- Sound like a real crypto community operator, not a bot.',
     '- Keep total length moderate: not too short, not a wall of text.',
     '- If no X post URL is provided, skip the thread link section.',
+    '- NEVER ask the user for more information. NEVER say "I\'m ready to help" or "Could you provide". You ALWAYS have enough to write an announcement. If the input is vague, write a general community update.',
+    '- Your output must ALWAYS be a finished announcement, never a question or meta-response.',
   ].join('\n');
 
   const controller = new AbortController();

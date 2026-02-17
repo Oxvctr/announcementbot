@@ -87,9 +87,9 @@ function createServer() {
     request.log.info({ payload: data }, 'webhook payload received');
 
     // Accept flexible payload: { text: "..." } or { post: { text: "..." } }
-    const postText = data?.text || data?.post?.text || data?.message || '';
-    if (!postText) {
-      return reply.status(400).send({ error: 'no post text found (send { text: "..." })' });
+    const postText = (data?.text || data?.post?.text || data?.message || '').trim();
+    if (!postText || postText.length < 20) {
+      return reply.status(400).send({ error: 'no post text found or too short (min 20 chars, send { text: "..." })' });
     }
 
     const postUrl = data?.url || data?.post?.url || data?.link || null;
@@ -114,6 +114,21 @@ function createServer() {
         });
         request.log.info({ approvalId }, 'webhook post queued for approval');
         return { status: 'pending_approval', approvalId, preview: rewritten.slice(0, 200) };
+      }
+
+      // Safety: reject AI output that looks like a meta/help response instead of a real announcement
+      const lowerRewritten = rewritten.toLowerCase();
+      if (
+        lowerRewritten.includes('i don\'t see any') ||
+        lowerRewritten.includes('could you provide') ||
+        lowerRewritten.includes('i\'m ready to help') ||
+        lowerRewritten.includes('please provide') ||
+        lowerRewritten.includes('drop the content') ||
+        lowerRewritten.includes('share the post') ||
+        lowerRewritten.includes('once you share')
+      ) {
+        request.log.warn({ rewritten: rewritten.slice(0, 200) }, 'AI returned meta/help response instead of announcement — blocked');
+        return reply.status(422).send({ error: 'AI did not produce a valid announcement from the input' });
       }
 
       const posted = await postToAnnounceChannels(rewritten, request.log, { url: postUrl });
