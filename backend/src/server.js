@@ -4,8 +4,7 @@ import { dirname, resolve } from 'node:path';
 import Fastify from 'fastify';
 import { randomUUID } from 'node:crypto';
 import { redisHealth, closeRedisClient } from './services/redisClient.js';
-import { startDiscordGateway, stopDiscordGateway, postToAnnounceChannels, pendingApprovals, getApprovalMode, setLastWebhookPost } from './discordBot.js';
-import { generateAnnouncement } from './services/announcer.js';
+import { startDiscordGateway, stopDiscordGateway, setLastWebhookPost } from './discordBot.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 dotenv.config({ path: resolve(__dirname, '../../.env') });
@@ -22,10 +21,6 @@ function getAiConfig() {
 
 function getWebhookAuthToken() {
   return process.env.WEBHOOK_AUTH_TOKEN || '';
-}
-
-function getDefaultStyle() {
-  return process.env.DEFAULT_STYLE || 'Professional, confident, concise crypto-native tone.';
 }
 
 function createServer() {
@@ -94,50 +89,10 @@ function createServer() {
 
     const postUrl = data?.url || data?.post?.url || data?.link || null;
 
-    // Store for /draft command
+    // Store silently for /draft command — NEVER auto-post to announce channels
     setLastWebhookPost(postText, postUrl);
-
-    try {
-      const rewritten = await generateAnnouncement(
-        `Rewrite this for Discord:\n\n${postText}${postUrl ? `\n\nOriginal post URL: ${postUrl}` : ''}`,
-        getDefaultStyle(),
-      );
-
-      // If approval mode is on, queue for admin approval instead of auto-posting
-      if (getApprovalMode()) {
-        const approvalId = `w-${Date.now()}`;
-        pendingApprovals.set(approvalId, {
-          text: postText,
-          rewritten,
-          url: postUrl,
-          timestamp: Date.now(),
-        });
-        request.log.info({ approvalId }, 'webhook post queued for approval');
-        return { status: 'pending_approval', approvalId, preview: rewritten.slice(0, 200) };
-      }
-
-      // Safety: reject AI output that looks like a meta/help response instead of a real announcement
-      const lowerRewritten = rewritten.toLowerCase();
-      if (
-        lowerRewritten.includes('i don\'t see any') ||
-        lowerRewritten.includes('could you provide') ||
-        lowerRewritten.includes('i\'m ready to help') ||
-        lowerRewritten.includes('please provide') ||
-        lowerRewritten.includes('drop the content') ||
-        lowerRewritten.includes('share the post') ||
-        lowerRewritten.includes('once you share')
-      ) {
-        request.log.warn({ rewritten: rewritten.slice(0, 200) }, 'AI returned meta/help response instead of announcement — blocked');
-        return reply.status(422).send({ error: 'AI did not produce a valid announcement from the input' });
-      }
-
-      const posted = await postToAnnounceChannels(rewritten, request.log, { url: postUrl });
-      request.log.info({ channels: posted }, 'announcement posted to discord');
-      return { status: 'posted', rewritten, channels_posted: posted };
-    } catch (err) {
-      request.log.error({ err }, 'announcement failed');
-      return reply.status(500).send({ error: 'announcement generation failed' });
-    }
+    request.log.info({ textLen: postText.length, url: postUrl }, 'webhook post stored for /draft');
+    return { status: 'stored', text_length: postText.length };
   });
 
   return app;

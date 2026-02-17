@@ -33,10 +33,6 @@ const MAX_SLASH_INPUT_LENGTH = 1500;
 
 let STYLE_MEMORY = FALLBACK_STYLE;
 
-// --- Approval flow state ---
-let APPROVAL_MODE = true; // when true, webhook posts require admin approval
-const pendingApprovals = new Map(); // id -> { text, rewritten, url, timestamp }
-
 // --- Last webhook post (stored when existing Zap sends to /webhook) ---
 let lastWebhookPost = null; // { text, url, receivedAt }
 
@@ -138,24 +134,7 @@ const SLASH_COMMANDS = [
   },
   {
     name: 'status',
-    description: 'Show current bot status (approval mode, channels, style)',
-  },
-  {
-    name: 'approve',
-    description: 'Toggle webhook approval mode or review pending posts',
-    options: [
-      {
-        name: 'action',
-        description: 'on/off to toggle, or "pending" to see queued approvals',
-        type: 3, // STRING
-        required: true,
-        choices: [
-          { name: 'on', value: 'on' },
-          { name: 'off', value: 'off' },
-          { name: 'pending', value: 'pending' },
-        ],
-      },
-    ],
+    description: 'Show current bot status (channels, style, last webhook post)',
   },
   {
     name: 'help',
@@ -335,48 +314,9 @@ async function handleInteraction(interaction, logger) {
       `**Style:** ${STYLE_MEMORY}`,
       `**Query channel:** ${qCh ? `<#${qCh}>` : 'not configured'}`,
       `**Announce channels:** ${getAnnounceChannels().length || 'none configured'}`,
-      `**Approval mode:** ${APPROVAL_MODE ? 'ON' : 'OFF'}`,
-      `**Pending approvals:** ${pendingApprovals.size}`,
       `**Last webhook post:** ${lastWebhookPost ? new Date(lastWebhookPost.receivedAt).toISOString() : 'none'}`,
     ];
     return interaction.reply({ content: lines.join('\n'), flags: MessageFlags.Ephemeral });
-  }
-
-  // /approve
-  if (commandName === 'approve') {
-    if (!isAdmin(interaction.user.id)) {
-      return interaction.reply({ content: 'Unauthorized.', flags: MessageFlags.Ephemeral });
-    }
-    const action = interaction.options.getString('action');
-
-    if (action === 'on') {
-      APPROVAL_MODE = true;
-      return interaction.reply({ content: 'Approval mode **enabled**. Webhook posts will require admin approval.', flags: MessageFlags.Ephemeral });
-    }
-    if (action === 'off') {
-      APPROVAL_MODE = false;
-      return interaction.reply({ content: 'Approval mode **disabled**. Webhook posts will auto-publish.', flags: MessageFlags.Ephemeral });
-    }
-    if (action === 'pending') {
-      if (pendingApprovals.size === 0) {
-        return interaction.reply({ content: 'No pending approvals.', flags: MessageFlags.Ephemeral });
-      }
-      await interaction.deferReply({ flags: MessageFlags.Ephemeral });
-      const entries = [...pendingApprovals.entries()].slice(0, 5);
-      for (const [id, item] of entries) {
-        const preview = item.rewritten.slice(0, 300) + (item.rewritten.length > 300 ? '...' : '');
-        const row = new ActionRowBuilder().addComponents(
-          new ButtonBuilder().setCustomId(`approval_yes_${id}`).setLabel('Post').setStyle(ButtonStyle.Success),
-          new ButtonBuilder().setCustomId(`approval_no_${id}`).setLabel('Reject').setStyle(ButtonStyle.Danger),
-        );
-        await interaction.followUp({
-          content: `**Pending #${id}:**\n${preview}${item.url ? `\n\nURL: ${item.url}` : ''}`,
-          components: [row],
-          flags: MessageFlags.Ephemeral,
-        });
-      }
-      return;
-    }
   }
 
   // /help
@@ -388,9 +328,6 @@ async function handleInteraction(interaction, logger) {
       '`/announce topic:` - Generate and post an announcement (shows draft first)',
       '`/draft` - Re-draft from the last Metricool post received via Zapier',
       '`/delete count:` - Delete last N bot messages from announce channels',
-      '',
-      '**Approval**',
-      '`/approve on/off/pending` - Toggle webhook approval mode or review pending posts',
       '',
       '**Info**',
       '`/status` - Show bot status',
@@ -452,33 +389,6 @@ function createClient(logger) {
   });
 
   bot.on('interactionCreate', async (interaction) => {
-    // Handle approval buttons (Upgrade 1)
-    if (interaction.isButton() && interaction.customId.startsWith('approval_')) {
-      if (!isAdmin(interaction.user.id)) {
-        return interaction.reply({ content: 'Unauthorized.', flags: MessageFlags.Ephemeral });
-      }
-      const parts = interaction.customId.split('_');
-      const action = parts[1]; // 'yes' or 'no'
-      const approvalId = parts.slice(2).join('_');
-      const item = pendingApprovals.get(approvalId);
-      if (!item) {
-        return interaction.update({ content: 'This approval has expired or was already handled.', components: [] });
-      }
-      if (action === 'yes') {
-        try {
-          const posted = await postToAnnounceChannels(item.rewritten, logger, { url: item.url });
-          pendingApprovals.delete(approvalId);
-          return interaction.update({ content: `✅ Posted to ${posted} channel(s).`, components: [] });
-        } catch (err) {
-          logger?.error?.({ err }, 'approval post failed');
-          return interaction.update({ content: `Failed to post: ${err.message}`, components: [] });
-        }
-      } else {
-        pendingApprovals.delete(approvalId);
-        return interaction.update({ content: '❌ Rejected and removed.', components: [] });
-      }
-    }
-
     try {
       await handleInteraction(interaction, logger);
     } catch (err) {
@@ -533,9 +443,5 @@ export {
   startDiscordGateway,
   stopDiscordGateway,
   postToAnnounceChannels,
-  pendingApprovals,
-  getApprovalMode,
   setLastWebhookPost,
 };
-
-function getApprovalMode() { return APPROVAL_MODE; }
