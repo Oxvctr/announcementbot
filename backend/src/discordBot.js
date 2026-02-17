@@ -245,7 +245,7 @@ async function handleInteraction(interaction, logger) {
     try {
       const btnInteraction = await response.awaitMessageComponent({
         filter: (i) => i.user.id === interaction.user.id,
-        time: 300_000,
+        time: 1_200_000,
       });
 
       if (btnInteraction.customId === 'announce_post') {
@@ -305,7 +305,7 @@ async function handleInteraction(interaction, logger) {
     try {
       const btnInteraction = await response.awaitMessageComponent({
         filter: (i) => i.user.id === interaction.user.id,
-        time: 300_000,
+        time: 1_200_000,
       });
       if (btnInteraction.customId === 'draft_post') {
         if (isMetaResponse(draft)) {
