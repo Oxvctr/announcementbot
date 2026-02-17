@@ -1,0 +1,19 @@
+{
+  "name": "smart-chatbot-backend",
+  "version": "0.1.0",
+  "description": "Fastify backend for Discord chatbot with Rust context service integration",
+  "main": "src/server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "NODE_ENV=development node src/server.js",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "discord.js": "^14.15.2",
+    "dotenv": "^17.2.4",
+    "fastify": "^4.26.1",
+    "ioredis": "^5.4.1",
+    "node-fetch": "^3.3.2"
+  }
+}

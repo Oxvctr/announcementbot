@@ -1,0 +1,14 @@
+[1]
+Aliases: intro, about, what
+Q: What is this bot?
+A: This bot delivers fast, context-grounded answers using a Rust context service and a thin API layer.
+
+[2]
+Aliases: pricing, cost, fee
+Q: How does pricing work?
+A: Pricing is community-managed in the FAQ; update the Google Doc entry to change it. The bot does not guess beyond provided context.
+
+[3]
+Aliases: reset, account
+Q: How do I reset my account?
+A: Use the account reset flow in your app. If you need help, contact support with your user ID.
