@@ -4,7 +4,8 @@ import { dirname, resolve } from 'node:path';
 import Fastify from 'fastify';
 import { randomUUID } from 'node:crypto';
 import { redisHealth, closeRedisClient } from './services/redisClient.js';
-import { startDiscordGateway, stopDiscordGateway, setLastWebhookPost } from './discordBot.js';
+import { startDiscordGateway, stopDiscordGateway, postToAnnounceChannels, pendingApprovals, getApprovalMode, setLastWebhookPost, sendApprovalReview } from './discordBot.js';
+import { generateAnnouncement } from './services/announcer.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 dotenv.config({ path: resolve(__dirname, '../../.env') });
@@ -89,10 +90,54 @@ function createServer() {
 
     const postUrl = data?.url || data?.post?.url || data?.link || null;
 
-    // Store silently for /draft command — NEVER auto-post to announce channels
+    // Always store for /draft command
     setLastWebhookPost(postText, postUrl);
-    request.log.info({ textLen: postText.length, url: postUrl }, 'webhook post stored for /draft');
-    return { status: 'stored', text_length: postText.length };
+
+    // Generate AI rewrite
+    let rewritten;
+    try {
+      rewritten = await generateAnnouncement(
+        `Rewrite this for Discord:\n\n${postText}${postUrl ? `\n\nOriginal post URL: ${postUrl}` : ''}`,
+        process.env.DEFAULT_STYLE || 'Professional, confident, concise crypto-native tone.',
+      );
+    } catch (err) {
+      request.log.error({ err }, 'AI generation failed');
+      return reply.status(500).send({ error: 'announcement generation failed' });
+    }
+
+    // Safety: block AI meta/help responses
+    const lower = rewritten.toLowerCase();
+    if (
+      lower.includes('i don\'t see any') ||
+      lower.includes('could you provide') ||
+      lower.includes('i\'m ready to help') ||
+      lower.includes('please provide') ||
+      lower.includes('drop the content') ||
+      lower.includes('share the post') ||
+      lower.includes('once you share')
+    ) {
+      request.log.warn({ rewritten: rewritten.slice(0, 200) }, 'AI returned meta response - blocked');
+      return reply.status(422).send({ error: 'AI did not produce a valid announcement' });
+    }
+
+    // --- Approval gate ---
+    if (getApprovalMode()) {
+      const approvalId = `w-${Date.now()}`;
+      pendingApprovals.set(approvalId, {
+        text: postText,
+        rewritten,
+        url: postUrl,
+        timestamp: Date.now(),
+      });
+      // Send review with Post/Reject buttons to the command channel (not announce channel)
+      await sendApprovalReview(approvalId, rewritten, postUrl, request.log);
+      return { status: 'pending_review', approvalId, preview: rewritten.slice(0, 200) };
+    }
+
+    // Approval OFF: auto-post directly
+    const posted = await postToAnnounceChannels(rewritten, request.log, { url: postUrl });
+    request.log.info({ channels: posted }, 'webhook auto-posted (approval off)');
+    return { status: 'posted', channels_posted: posted };
   });
 
   return app;

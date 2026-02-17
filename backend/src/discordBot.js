@@ -33,6 +33,10 @@ const MAX_SLASH_INPUT_LENGTH = 1500;
 
 let STYLE_MEMORY = FALLBACK_STYLE;
 
+// --- Approval gate: controls whether webhook posts auto-publish or require admin review ---
+let APPROVAL_MODE = true; // true = webhook drafts go to command channel for review; false = auto-post
+const pendingApprovals = new Map(); // id -> { text, rewritten, url, timestamp }
+
 // --- Last webhook post (stored when existing Zap sends to /webhook) ---
 let lastWebhookPost = null; // { text, url, receivedAt }
 
@@ -133,8 +137,24 @@ const SLASH_COMMANDS = [
     description: 'Re-draft announcement from the last Metricool post received via Zapier',
   },
   {
+    name: 'approve',
+    description: 'Toggle whether webhook posts auto-publish or require admin review',
+    options: [
+      {
+        name: 'state',
+        description: 'on = require review, off = auto-post',
+        type: 3, // STRING
+        required: true,
+        choices: [
+          { name: 'on', value: 'on' },
+          { name: 'off', value: 'off' },
+        ],
+      },
+    ],
+  },
+  {
     name: 'status',
-    description: 'Show current bot status (channels, style, last webhook post)',
+    description: 'Show current bot status (approval gate, channels, style)',
   },
   {
     name: 'help',
@@ -304,6 +324,21 @@ async function handleInteraction(interaction, logger) {
     return;
   }
 
+  // /approve
+  if (commandName === 'approve') {
+    if (!isAdmin(interaction.user.id)) {
+      return interaction.reply({ content: 'Unauthorized.', flags: MessageFlags.Ephemeral });
+    }
+    const state = interaction.options.getString('state');
+    APPROVAL_MODE = state === 'on';
+    return interaction.reply({
+      content: APPROVAL_MODE
+        ? 'Approval gate **ON**. Webhook posts will be sent here for review before publishing.'
+        : 'Approval gate **OFF**. Webhook posts will auto-publish to announce channels.',
+      flags: MessageFlags.Ephemeral,
+    });
+  }
+
   // /status
   if (commandName === 'status') {
     if (!isAdmin(interaction.user.id)) {
@@ -311,6 +346,8 @@ async function handleInteraction(interaction, logger) {
     }
     const qCh = getQueryChannelId();
     const lines = [
+      `**Approval gate:** ${APPROVAL_MODE ? 'ON (review before publish)' : 'OFF (auto-publish)'}`,
+      `**Pending reviews:** ${pendingApprovals.size}`,
       `**Style:** ${STYLE_MEMORY}`,
       `**Query channel:** ${qCh ? `<#${qCh}>` : 'not configured'}`,
       `**Announce channels:** ${getAnnounceChannels().length || 'none configured'}`,
@@ -328,6 +365,10 @@ async function handleInteraction(interaction, logger) {
       '`/announce topic:` - Generate and post an announcement (shows draft first)',
       '`/draft` - Re-draft from the last Metricool post received via Zapier',
       '`/delete count:` - Delete last N bot messages from announce channels',
+      '',
+      '**Webhook Gate**',
+      '`/approve on` - Webhook posts require your review before publishing',
+      '`/approve off` - Webhook posts auto-publish to announce channels',
       '',
       '**Info**',
       '`/status` - Show bot status',
@@ -389,6 +430,33 @@ function createClient(logger) {
   });
 
   bot.on('interactionCreate', async (interaction) => {
+    // Handle approval review buttons (Post / Reject)
+    if (interaction.isButton() && interaction.customId.startsWith('approval_')) {
+      if (!isAdmin(interaction.user.id)) {
+        return interaction.reply({ content: 'Unauthorized.', flags: MessageFlags.Ephemeral });
+      }
+      const parts = interaction.customId.split('_');
+      const action = parts[1]; // 'yes' or 'no'
+      const approvalId = parts.slice(2).join('_');
+      const item = pendingApprovals.get(approvalId);
+      if (!item) {
+        return interaction.update({ content: 'This review has expired or was already handled.', components: [] });
+      }
+      if (action === 'yes') {
+        try {
+          const posted = await postToAnnounceChannels(item.rewritten, logger, { url: item.url });
+          pendingApprovals.delete(approvalId);
+          return interaction.update({ content: `Posted to ${posted} channel(s).`, components: [] });
+        } catch (err) {
+          logger?.error?.({ err }, 'approval post failed');
+          return interaction.update({ content: `Failed to post: ${err.message}`, components: [] });
+        }
+      } else {
+        pendingApprovals.delete(approvalId);
+        return interaction.update({ content: 'Rejected and discarded.', components: [] });
+      }
+    }
+
     try {
       await handleInteraction(interaction, logger);
     } catch (err) {
@@ -439,9 +507,36 @@ function setLastWebhookPost(text, url) {
   lastWebhookPost = { text, url: url || null, receivedAt: Date.now() };
 }
 
+function getApprovalMode() { return APPROVAL_MODE; }
+
+// Send a review message with Post/Reject buttons to the command channel
+async function sendApprovalReview(approvalId, rewritten, postUrl, logger) {
+  const queryChannelId = getQueryChannelId();
+  if (!queryChannelId || !client?.isReady?.()) return;
+  try {
+    const channel = await client.channels.fetch(queryChannelId);
+    if (!channel?.isTextBased?.()) return;
+    const row = new ActionRowBuilder().addComponents(
+      new ButtonBuilder().setCustomId(`approval_yes_${approvalId}`).setLabel('Post').setStyle(ButtonStyle.Success),
+      new ButtonBuilder().setCustomId(`approval_no_${approvalId}`).setLabel('Reject').setStyle(ButtonStyle.Danger),
+    );
+    const preview = rewritten.slice(0, 1800);
+    await channel.send({
+      content: `**Webhook post for review:**\n${preview}${postUrl ? `\n\nSource: ${postUrl}` : ''}`,
+      components: [row],
+    });
+    logger?.info?.({ approvalId, channel: queryChannelId }, 'approval review sent to command channel');
+  } catch (err) {
+    logger?.error?.({ err }, 'failed to send approval review to command channel');
+  }
+}
+
 export {
   startDiscordGateway,
   stopDiscordGateway,
   postToAnnounceChannels,
+  pendingApprovals,
+  getApprovalMode,
   setLastWebhookPost,
+  sendApprovalReview,
 };
