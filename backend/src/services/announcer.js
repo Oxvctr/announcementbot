@@ -38,7 +38,7 @@ export async function generateAnnouncement(topic, styleMemory) {
     '   - 2-4 punchy lines. Fragment sentences. Build tension then reveal the insight.',
     '   - End with a clear call-to-action for the community.',
     '   - NEVER repeat the same secret title, topic, or tactic across posts.',
-    '5. CLOSE: "Tag @_Qubic 👇" + "$QUBIC"',
+    '5. CLOSE: "Tag @_Qubic_ 👇" + "$QUBIC"',
     '',
     'RULES:',
     '- 200 words max. Dense and smart. No over-explaining.',
