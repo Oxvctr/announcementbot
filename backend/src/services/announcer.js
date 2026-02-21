@@ -29,7 +29,7 @@ export async function generateAnnouncement(topic, styleMemory) {
     'You MUST follow the exact structure shown in the conversation examples.',
     '',
     'STRUCTURE:',
-    '1) Hook line with emoji (NEW POST LIVE: TOPIC or RAID ALERT: TOPIC)',
+    '1) Bold hook line with emojis (**RAID ALERT: TOPIC** 🚨 or **NEW POST LIVE: TOPIC** 🔥)',
     '2) Brief context - 2 to 4 short sentences summarizing the news. Punchy, not paragraphs.',
     '3) Call to action lines - Like. RT. Bookmark. Comment. Quote tweet with specific instruction.',
     '4) Instruction to share it beyond the Qubic community.',
@@ -38,13 +38,14 @@ export async function generateAnnouncement(topic, styleMemory) {
     '',
     'RULES:',
     '- Keep it punchy. Short sentences. No walls of text.',
-    '- NEVER use markdown: no bold (**), no headers (#), no code blocks.',
-    '- Use bullet points (•) ONLY inside raid objectives.',
+    '- Use **bold** for hook lines, section headers, and key emphasis.',
+    '- Use emojis generously throughout. Match emojis to context (mining = ⛏️💪, speed = ⚡, fire = 🔥, alert = 🚨, target = 🎯, rocket = 🚀, chart = 📈, brain = 🧠, link = 🔗, warning = ⚠️, check = ✅, eyes = 👀, point down = 🔽).',
+    '- Use bullet points (•) inside raid objectives.',
     '- Twitter handle is @_Qubic_ (with underscores).',
     '- Always end with @Social Media Booster.',
     '- Include the post URL inline with 🔗 if provided.',
     '- Vary the hook style: RAID ALERT, NEW POST LIVE, COMMUNITY ALERT, etc.',
-    '- 200 words max.',
+    '- 250 words max.',
   ].join('\n');
 
   // Few-shot examples: show the AI exact input→output pairs so it pattern-matches
@@ -55,7 +56,7 @@ export async function generateAnnouncement(topic, styleMemory) {
     },
     {
       role: 'assistant',
-      content: `RAID ALERT: EPOCH 200 PROFITABILITY REPORT IS LIVE �\nCPU miners, this one is for you.\n\nQubic just dropped the latest Epoch 200 data and the numbers speak loud.\n\n🔗 https://x.com/_qubic_/status/2024832523054813476\n\n🎯 RAID OBJECTIVE\n• Like\n• Repost\n• Drop a sharp comment about Useful PoW\n• Tag a CPU miner\n\nLet's push this beyond the Qubic bubble and into the wider PoW crowd.\n\nTime to show what efficient mining actually looks like. 💪\n@Social Media Booster`,
+      content: `**RAID ALERT: EPOCH 200 PROFITABILITY REPORT IS LIVE** 🚨\nCPU miners, this one is for you. ⛏️\n\nQubic just dropped the latest Epoch 200 data and the numbers speak loud 📈\n\n🔗 https://x.com/_qubic_/status/2024832523054813476\n\n🎯 **RAID OBJECTIVE**\n• Like ❤️\n• Repost 🔁\n• Drop a sharp comment about Useful PoW 💬\n• Tag a CPU miner 👀\n\nLet's push this beyond the Qubic bubble and into the wider PoW crowd 🚀\n\nTime to show what efficient mining actually looks like. 💪\n@Social Media Booster`,
     },
     {
       role: 'user',
@@ -63,7 +64,7 @@ export async function generateAnnouncement(topic, styleMemory) {
     },
     {
       role: 'assistant',
-      content: `NEW POST LIVE: DOGECOIN MINING IS COMING TO QUBIC\nDesign phase done. Project plan finalized. Two workstreams running in parallel. Target mainnet launch: April 1, 2026.\n\nQubic already took over the Monero network with its miners. Now Dogecoin is next. Same energy, same infrastructure, more utility. Useful Proof of Work keeps expanding into a universal compute engine.\n\nOne of the biggest communities in crypto is about to meet one of the most undervalued compute networks in the space. This is the kind of post that bridges two worlds.\n\nLet's make sure both of them see it. 🔽\n\nLike. RT. Bookmark. Comment. Quote tweet and tag every DOGE holder and miner you know.\nDon't let it sit quiet. 🤐\n🔗 https://x.com/_qubic_/status/2024862746517426493\n\n@Social Media Booster`,
+      content: `**NEW POST LIVE: DOGECOIN MINING IS COMING TO QUBIC** 🚀🐕\nDesign phase done ✅ Project plan finalized ✅ Two workstreams running in parallel.\nTarget mainnet launch: April 1, 2026 📅\n\nQubic already took over the Monero network with its miners ⛏️ Now Dogecoin is next. Same energy, same infrastructure, more utility. Useful Proof of Work keeps expanding into a universal compute engine 🧠\n\nOne of the biggest communities in crypto is about to meet one of the most undervalued compute networks in the space 🔥 This is the kind of post that bridges two worlds.\n\nLet's make sure both of them see it 🔽\n\nLike. RT. Bookmark. Comment. Quote tweet and tag every DOGE holder and miner you know 📣\nDon't let it sit quiet 🤐\n\n🔗 https://x.com/_qubic_/status/2024862746517426493\n@Social Media Booster`,
     },
     {
       role: 'user',
@@ -71,7 +72,7 @@ export async function generateAnnouncement(topic, styleMemory) {
     },
     {
       role: 'assistant',
-      content: `NEW POST LIVE: QUBIC ALL-HANDS RECAP\nNeuraxon 2.0. AI research. Oracle infrastructure. Mining expansion. Governance. Wallet tooling.\n\nAll moving at the same time, all hitting mainnet in the next 60 days.\nOne All-Hands.\n\nFive major milestones. Every single one of them shipping.\n\nThis is the post that shows what Qubic actually looks like when everything clicks.\n\nLike. RT. Bookmark. Comment. Quote tweet and tag anyone building in AI, mining, or DeFi infrastructure.\n\nDon't let it sit quiet. 🔽\n\n🔗 https://x.com/_qubic_/status/2024907910468235582\n@Social Media Booster`,
+      content: `**NEW POST LIVE: QUBIC ALL-HANDS RECAP** 📢🔥\nNeuraxon 2.0 🧠 AI research ⚡ Oracle infrastructure 🔮 Mining expansion ⛏️ Governance 🏛️ Wallet tooling 🛠️\n\nAll moving at the same time, all hitting mainnet in the next 60 days 🚀\nOne All-Hands. Five major milestones. Every single one of them shipping ✅\n\nThis is the post that shows what Qubic actually looks like when everything clicks 💪\n\nLike. RT. Bookmark. Comment. Quote tweet and tag anyone building in AI, mining, or DeFi infrastructure 📣\n\nDon't let it sit quiet 🔽\n\n🔗 https://x.com/_qubic_/status/2024907910468235582\n@Social Media Booster`,
     },
   ];
 
@@ -109,12 +110,10 @@ export async function generateAnnouncement(topic, styleMemory) {
       reply = reply.map((p) => (typeof p === 'string' ? p : p.text || '')).join('\n');
     }
     if (typeof reply === 'string') {
-      // Light sanitization: strip markdown only, preserve line structure
+      // Light sanitization: keep bold and bullets, strip unwanted markdown
       let clean = reply
         .replace(/[—–]/g, '-')                    // em/en dashes → hyphens
         .replace(/^#+\s+/gm, '')                  // strip headers (# text)
-        .replace(/\*\*(.+?)\*\*/g, '$1')          // strip bold (**text**)
-        .replace(/^[•\-*]\s+/gm, '')              // strip bullet points
         .replace(/^\s*>\s+/gm, '')                // strip blockquotes
         .replace(/`([^`]+)`/g, '$1')              // strip inline code
         .trim();
