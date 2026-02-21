@@ -121,7 +121,34 @@ export async function generateAnnouncement(topic, styleMemory) {
         .replace(/^\s*>\s+/gm, '')                // strip blockquotes
         .replace(/`([^`]+)`/g, '$1')              // strip inline code
         .trim();
-      return clean;
+      
+      // Force fragments: split long lines, remove connecting words
+      const lines = clean.split('\n');
+      const fragmentLines = lines.map(line => {
+        // Split on periods, question marks, exclamation marks
+        const parts = line.split(/([.!?])/);
+        let result = '';
+        for (let i = 0; i < parts.length; i += 2) {
+          const sentence = parts[i]?.trim() || '';
+          if (!sentence) continue;
+          // Remove connecting words and articles
+          let fragment = sentence
+            .replace(/^(and|but|or|so|because|although|however|therefore|meanwhile|also|plus)\s+/gi, '')
+            .replace(/^(a|an|the)\s+/gi, '')
+            .replace(/\s+(and|but|or|so|because)\s+/gi, ' ')
+            .replace(/\s+(a|an|the)\s+/gi, ' ');
+          // If fragment is too long, split it
+          if (fragment.length > 60) {
+            const words = fragment.split(' ');
+            const mid = Math.floor(words.length / 2);
+            fragment = words.slice(0, mid).join(' ') + '\n' + words.slice(mid).join(' ');
+          }
+          result += fragment + '\n';
+        }
+        return result.trim();
+      });
+      
+      return fragmentLines.filter(l => l).join('\n').trim();
     }
     return `[AI returned empty] Topic: ${topic}`;
   } catch (err) {
