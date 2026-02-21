@@ -7,7 +7,7 @@ function getConfig() {
     url: process.env.AI_API_URL || 'https://api.anthropic.com/v1/messages',
     key: process.env.AI_API_KEY || '',
     model: process.env.AI_MODEL || 'claude-haiku-4-5-20251001',
-    maxTokens: Number(process.env.AI_ANNOUNCE_MAX_TOKENS || 350),
+    maxTokens: Number(process.env.AI_ANNOUNCE_MAX_TOKENS || 500),
     timeout: Number(process.env.AI_REQUEST_TIMEOUT_MS || 10_000),
   };
 }

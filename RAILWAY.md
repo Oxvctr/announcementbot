@@ -46,7 +46,7 @@ Go to the **Variables** tab and add each of these (copy values from your local `
 | `AI_API_URL` | `https://api.anthropic.com/v1/messages` |
 | `AI_API_KEY` | Your Anthropic API key |
 | `AI_MODEL` | `claude-haiku-4-5-20251001` |
-| `AI_ANNOUNCE_MAX_TOKENS` | `800` |
+| `AI_ANNOUNCE_MAX_TOKENS` | `500` (minimum for fragment format) |
 | `AI_REQUEST_TIMEOUT_MS` | `10000` |
 | `DISCORD_BOT_TOKEN` | Your Discord bot token |
 | `DISCORD_GATEWAY_ENABLED` | `true` |
