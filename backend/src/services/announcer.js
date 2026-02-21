@@ -1,6 +1,19 @@
 // Announcer — LLM-powered announcement generation with style memory.
 
 import fetch from 'node-fetch';
+import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+import { dirname, resolve } from 'node:path';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+
+function loadTemplate() {
+  try {
+    return readFileSync(resolve(__dirname, '../../../knowledge/announcement-template.md'), 'utf8');
+  } catch {
+    return '';
+  }
+}
 
 function getConfig() {
   return {
@@ -24,31 +37,13 @@ export async function generateAnnouncement(topic, styleMemory) {
     return `[AI disabled] Announcement about: ${topic}`;
   }
 
+  const template = loadTemplate();
   const systemPrompt = [
     `You are a sharp Discord community manager for Qubic ($QUBIC). Tone: ${styleMemory || 'Professional, confident, concise crypto-native tone.'}`,
     '',
-    'Rewrite X (Twitter) posts into compact Discord announcements. 200 words or less. Smart, not wordy.',
+    'Rewrite X (Twitter) posts into compact Discord announcements following the approved template and examples below.',
     '',
-    'FORMAT (6-12 lines):',
-    '1. HOOK: One bold line. Emoji optional. Grab attention.',
-    '2. FACTS: 2-3 short lines. Fragments, arrows (→), real numbers. Zero fluff.',
-    '3. LINK: "Thread:" + URL if provided. Skip if none.',
-    '4. ALGO SECRET: Start with 🔐 and a unique title (never reuse). Teach ONE specific X algorithm tactic:',
-    '   - Topics: reply timing clusters, conversation depth, quote originality, bookmark velocity, scroll-stop time, engagement order, network spread, first-30-minutes rule, thread hooks, repost windows, etc.',
-    '   - 2-4 punchy lines. Fragment sentences. Build tension then reveal the insight.',
-    '   - End with a clear call-to-action for the community.',
-    '   - NEVER repeat the same secret title, topic, or tactic across posts.',
-    '5. CLOSE: "Tag @_Qubic_ 👇" + "$QUBIC"',
-    '',
-    'RULES:',
-    '- 200 words max. Dense and smart. No over-explaining.',
-    '- Never repeat the same hook, algo secret, or structure twice.',
-    '- No em dashes or en dashes. Use hyphens, commas, colons.',
-    '- Include concrete facts and numbers from the source.',
-    '- Sound like a crypto insider, not a bot. Vary rhythm and emoji use.',
-    '- Skip the thread link if no URL is provided.',
-    '- NEVER ask for more info. NEVER say "I\'m ready to help" or "Could you provide".',
-    '- Output must ALWAYS be a finished announcement, never a question.',
+    template,
   ].join('\n');
 
   const controller = new AbortController();

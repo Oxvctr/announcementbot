@@ -2,7 +2,7 @@ import dotenv from 'dotenv';
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
 import Fastify from 'fastify';
-import { randomUUID } from 'node:crypto';
+import { randomUUID, createHash } from 'node:crypto';
 import { redisHealth, closeRedisClient } from './services/redisClient.js';
 import { startDiscordGateway, stopDiscordGateway, postToAnnounceChannels, pendingApprovals, getApprovalMode, setLastWebhookPost, sendApprovalReview } from './discordBot.js';
 import { generateAnnouncement } from './services/announcer.js';
@@ -22,6 +22,22 @@ function getAiConfig() {
 
 function getWebhookAuthToken() {
   return process.env.WEBHOOK_AUTH_TOKEN || '';
+}
+
+// --- Dedup: prevent same source text from posting twice within the window ---
+const DEDUP_WINDOW_MS = 60_000;
+const recentHashes = new Map(); // hash -> timestamp
+
+function isDuplicate(text) {
+  const hash = createHash('sha256').update(text.trim().toLowerCase()).digest('hex').slice(0, 16);
+  const now = Date.now();
+  // Purge expired entries
+  for (const [h, ts] of recentHashes) {
+    if (now - ts > DEDUP_WINDOW_MS) recentHashes.delete(h);
+  }
+  if (recentHashes.has(hash)) return true;
+  recentHashes.set(hash, now);
+  return false;
 }
 
 function createServer() {
@@ -89,6 +105,12 @@ function createServer() {
     }
 
     const postUrl = data?.url || data?.post?.url || data?.link || null;
+
+    // Dedup: block same source text within 60s (prevents Zapier double-fire)
+    if (isDuplicate(postText)) {
+      request.log.warn({ postText: postText.slice(0, 80) }, 'duplicate webhook payload blocked');
+      return reply.status(429).send({ error: 'duplicate: same post received within dedup window' });
+    }
 
     // Always store for /draft command
     setLastWebhookPost(postText, postUrl);
