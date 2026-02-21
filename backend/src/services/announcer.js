@@ -72,6 +72,17 @@ export async function generateAnnouncement(topic, styleMemory) {
     '- Skip Thread/URL block entirely if no URL is provided.',
     '- NEVER ask for more info. Output must always be a finished announcement.',
     '- Twitter handle is always @_Qubic_ (trailing underscore).',
+    '',
+    'WRONG (do NOT output like this):',
+    '# 🔌 Energy That Actually Produces Something',
+    '**Useful Proof of Work** turns mining electricity into compounding value:',
+    '- 🔐 Secures the network',
+    '- 🧠 Trains neural networks',
+    '',
+    'RIGHT (output like this):',
+    '🚨 Useful Proof of Work is LIVE 🔥',
+    'Mining secures network + trains AI + mines Monero.',
+    'Same electricity, multiple outputs.',
   ].join('\n');
 
   const controller = new AbortController();
@@ -88,7 +99,7 @@ export async function generateAnnouncement(topic, styleMemory) {
       body: JSON.stringify({
         model: cfg.model,
         max_tokens: cfg.maxTokens,
-        temperature: 0.7,
+        temperature: 0.3,
         system: systemPrompt,
         messages: [
           { role: 'user', content: topic },
@@ -107,8 +118,16 @@ export async function generateAnnouncement(topic, styleMemory) {
       reply = reply.map((p) => (typeof p === 'string' ? p : p.text || '')).join('\n');
     }
     if (typeof reply === 'string') {
-      // Hard guard: strip em/en dashes even if model ignores instructions.
-      return reply.replace(/[—–]/g, '-').trim();
+      // Aggressive sanitization: strip all markdown formatting
+      let clean = reply
+        .replace(/[—–]/g, '-')                    // em/en dashes → hyphens
+        .replace(/^#+\s+/gm, '')                  // strip headers (# text)
+        .replace(/\*\*(.+?)\*\*/g, '$1')          // strip bold (**text**)
+        .replace(/^[•\-*]\s+/gm, '')              // strip bullet points
+        .replace(/^\s*>\s+/gm, '')                // strip blockquotes
+        .replace(/`([^`]+)`/g, '$1')              // strip inline code
+        .trim();
+      return clean;
     }
     return `[AI returned empty] Topic: ${topic}`;
   } catch (err) {
