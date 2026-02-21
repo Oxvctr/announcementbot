@@ -25,59 +25,52 @@ export async function generateAnnouncement(topic, styleMemory) {
   }
 
   const systemPrompt = [
-    'You are a text formatter. Extract key information from the input and format it into fragments.',
-    'Do NOT rewrite. Do NOT write natural sentences. Extract facts and format as fragments.',
-    '',
-    'OUTPUT FORMAT (fragments only):',
-    '',
-    '🚨 [HOOK — one punchy line, emoji optional]',
-    '[FACT 1 — fragment, arrow or colon, real numbers]',
-    '[FACT 2 — fragment]',
-    '[FACT 3 — optional]',
-    '',
-    '[Thread:]',
-    '[URL — only if provided, skip entire block if no URL]',
-    '',
-    '🔐 [UNIQUE ALGO SECRET TITLE]:',
-    '[Tension line 1 — fragment]',
-    '[Tension line 2 — fragment]',
-    '[Insight reveal — fragment]',
-    '[Community call to action — fragment]',
-    '',
-    'Tag @_Qubic_ 👇',
-    '$QUBIC',
-    '',
-    'EXAMPLE:',
-    '🚨 COMMUNITY ALERT: Qubic Oracle Machines are LIVE 🔥',
-    'Real-world data now feeds directly into smart contracts, verified by 676 Computors.',
-    'Every query burns $QUBIC → usage = deflation.',
-    '',
-    'Official thread:',
-    'https://x.com/Qubic/status/2021638947453943977',
-    '',
-    '🔐 X Algo Secret (most people miss this):',
-    'It\'s not just replies, it\'s reply timing clusters.',
-    'If 8 to 15 replies hit within a tight 5 to 10 minute window,',
-    'X flags the post as "conversation forming" and expands testing.',
-    'Slow trickle = capped reach.',
-    'Fast cluster = distribution unlock.',
-    'If you\'re engaging, do it now, not later.',
-    '',
-    'Tag @_Qubic_ 👇',
-    '$QUBIC #OracleMachines',
+    'You rewrite social media posts into Discord community announcements for Qubic ($QUBIC).',
+    'You MUST follow the exact structure shown in the conversation examples.',
+    'Every announcement has 3 sections separated by blank lines:',
+    '1) Hook + facts (short lines, fragments)',
+    '2) Thread URL (only if URL provided, otherwise skip entirely)',
+    '3) 🔐 Algo secret section (short punchy lines, each on its own line)',
+    '4) Tag @_Qubic_ 👇 and $QUBIC at the end',
     '',
     'RULES:',
-    '- Extract facts from input. Format as fragments.',
-    '- 200 words max. No over-explaining.',
-    '- NEVER write full sentences. NEVER write paragraphs.',
-    '- NEVER use bold, headers, bullets, or markdown.',
-    '- No em dashes. Use hyphens, commas, colons.',
-    '- Skip Thread/URL block if no URL.',
-    '- Output must be finished announcement.',
-    '- Twitter handle: @_Qubic_',
-    '',
-    'CRITICAL: Output MUST be fragments only. No sentences. No paragraphs.',
+    '- Each line is a short fragment. Max 1-2 clauses per line.',
+    '- Use line breaks liberally. One thought per line.',
+    '- NEVER use markdown: no bold, no headers, no bullets.',
+    '- NEVER write long paragraph sentences.',
+    '- 200 words max.',
+    '- Do NOT include the Thread/URL section in your output. It will be appended automatically.',
+    '- Twitter handle is always @_Qubic_ (with trailing underscore).',
+    '- Invent a unique 🔐 algo secret title each time. Never repeat.',
   ].join('\n');
+
+  // Few-shot examples: show the AI exact input→output pairs so it pattern-matches
+  const fewShotMessages = [
+    {
+      role: 'user',
+      content: 'Qubic Oracle Machines are now live. Real-world data feeds into smart contracts verified by 676 Computors. Every query burns QUBIC tokens.\n\nOriginal post URL: https://x.com/Qubic/status/2021638947453943977',
+    },
+    {
+      role: 'assistant',
+      content: `🚨 COMMUNITY ALERT: Qubic Oracle Machines are LIVE 🔥\nReal-world data now feeds directly into smart contracts, verified by 676 Computors.\n\nEvery query burns $QUBIC → usage = deflation.\n\n🔐 X Algo Secret (most people miss this):\nIt's not just replies, it's reply timing clusters.\n\nIf 8 to 15 replies hit within a tight 5 to 10 minute window,\nX flags the post as "conversation forming" and expands testing.\n\nSlow trickle = capped reach.\nFast cluster = distribution unlock.\nIf you're engaging, do it now, not later.\n\nTag @_Qubic_ 👇\n$QUBIC #OracleMachines`,
+    },
+    {
+      role: 'user',
+      content: 'Qubic Oracle Machines launched. 676 Computors verify data. Oracle calls burn QUBIC.\n\nOriginal post URL: https://x.com/Qubic/status/2021638947453943977',
+    },
+    {
+      role: 'assistant',
+      content: `🚨 Qubic Oracle Machines are LIVE 🔥\n676 Computors verifying real-world data.\nEvery oracle call burns $QUBIC permanently.\n\n🔐 Underused Algo Lever:\n\nBookmarks extend lifespan.\n\nWhen bookmarks spike early,\nX assumes "future reference value"\nand keeps testing the post longer.\n\nMost people ignore this.\nThey shouldn't.\nReply. Quote.\n\nBut also bookmark.\n\nIt quietly extends reach.\n\nTag @_Qubic_ 👇\n$QUBIC`,
+    },
+    {
+      role: 'user',
+      content: 'Qubic Oracle Machines are live. Smart contracts plus real-world data. 676 Computors. Each query burns QUBIC.\n\nOriginal post URL: https://x.com/Qubic/status/2021638947453943977',
+    },
+    {
+      role: 'assistant',
+      content: `🚨 Qubic Oracle Machines are LIVE 🔥\n\nSmart contracts + real-world data.\nVerified by 676 Computors.\nEach query burns $QUBIC.\n\n🔐 The 30-Minute Rule:\nIf meaningful engagement crosses a threshold\nin the first 30 minutes,\nX shifts the post into discovery feeds.\n\nMiss that window,\nand reach compresses.\n\nEarly action compounds.\n\nLate action barely registers.\n\nEngage fast.\n\nTag @_Qubic_ 👇\n$QUBIC`,
+    },
+  ];
 
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), cfg.timeout);
@@ -93,9 +86,10 @@ export async function generateAnnouncement(topic, styleMemory) {
       body: JSON.stringify({
         model: cfg.model,
         max_tokens: cfg.maxTokens,
-        temperature: 0.1,
+        temperature: 0.3,
         system: systemPrompt,
         messages: [
+          ...fewShotMessages,
           { role: 'user', content: topic },
         ],
       }),
@@ -112,7 +106,7 @@ export async function generateAnnouncement(topic, styleMemory) {
       reply = reply.map((p) => (typeof p === 'string' ? p : p.text || '')).join('\n');
     }
     if (typeof reply === 'string') {
-      // Aggressive sanitization: strip all markdown formatting
+      // Light sanitization: strip markdown only, preserve line structure
       let clean = reply
         .replace(/[—–]/g, '-')                    // em/en dashes → hyphens
         .replace(/^#+\s+/gm, '')                  // strip headers (# text)
@@ -121,34 +115,7 @@ export async function generateAnnouncement(topic, styleMemory) {
         .replace(/^\s*>\s+/gm, '')                // strip blockquotes
         .replace(/`([^`]+)`/g, '$1')              // strip inline code
         .trim();
-      
-      // Force fragments: split long lines, remove connecting words
-      const lines = clean.split('\n');
-      const fragmentLines = lines.map(line => {
-        // Split on periods, question marks, exclamation marks
-        const parts = line.split(/([.!?])/);
-        let result = '';
-        for (let i = 0; i < parts.length; i += 2) {
-          const sentence = parts[i]?.trim() || '';
-          if (!sentence) continue;
-          // Remove connecting words and articles
-          let fragment = sentence
-            .replace(/^(and|but|or|so|because|although|however|therefore|meanwhile|also|plus)\s+/gi, '')
-            .replace(/^(a|an|the)\s+/gi, '')
-            .replace(/\s+(and|but|or|so|because)\s+/gi, ' ')
-            .replace(/\s+(a|an|the)\s+/gi, ' ');
-          // If fragment is too long, split it
-          if (fragment.length > 60) {
-            const words = fragment.split(' ');
-            const mid = Math.floor(words.length / 2);
-            fragment = words.slice(0, mid).join(' ') + '\n' + words.slice(mid).join(' ');
-          }
-          result += fragment + '\n';
-        }
-        return result.trim();
-      });
-      
-      return fragmentLines.filter(l => l).join('\n').trim();
+      return clean;
     }
     return `[AI returned empty] Topic: ${topic}`;
   } catch (err) {
