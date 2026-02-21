@@ -129,7 +129,7 @@ function createServer() {
     let rewritten;
     try {
       rewritten = await generateAnnouncement(
-        `Rewrite this for Discord:\n\n${postText}${postUrl ? `\n\nOriginal post URL: ${postUrl}` : ''}`,
+        `${postText}${postUrl ? `\n\nOriginal post URL: ${postUrl}` : ''}`,
         process.env.DEFAULT_STYLE || 'Professional, confident, concise crypto-native tone.',
       );
     } catch (err) {

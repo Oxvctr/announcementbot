@@ -284,7 +284,7 @@ async function handleInteraction(interaction, logger) {
     let draft;
     try {
       draft = await generateAnnouncement(
-        `Rewrite this for Discord:\n\n${lastWebhookPost.text}${lastWebhookPost.url ? `\n\nOriginal post URL: ${lastWebhookPost.url}` : ''}`,
+        `${lastWebhookPost.text}${lastWebhookPost.url ? `\n\nOriginal post URL: ${lastWebhookPost.url}` : ''}`,
         STYLE_MEMORY,
       );
     } catch (err) {
