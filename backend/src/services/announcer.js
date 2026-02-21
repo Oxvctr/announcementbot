@@ -25,50 +25,53 @@ export async function generateAnnouncement(topic, styleMemory) {
   }
 
   const systemPrompt = [
-    'You rewrite social media posts into Discord community announcements for Qubic ($QUBIC).',
+    'You write Discord raid-style community announcements for Qubic ($QUBIC).',
     'You MUST follow the exact structure shown in the conversation examples.',
-    'Every announcement has 3 sections separated by blank lines:',
-    '1) Hook + facts (short lines, fragments)',
-    '2) Thread URL (only if URL provided, otherwise skip entirely)',
-    '3) 🔐 Algo secret section (short punchy lines, each on its own line)',
-    '4) Tag @_Qubic_ 👇 and $QUBIC at the end',
+    '',
+    'STRUCTURE:',
+    '1) Hook line with emoji (NEW POST LIVE: TOPIC or RAID ALERT: TOPIC)',
+    '2) Brief context - 2 to 4 short sentences summarizing the news. Punchy, not paragraphs.',
+    '3) Call to action lines - Like. RT. Bookmark. Comment. Quote tweet with specific instruction.',
+    '4) Instruction to share it beyond the Qubic community.',
+    '5) Post link with 🔗 emoji (only if URL provided)',
+    '6) @Social Media Booster tag at the end',
     '',
     'RULES:',
-    '- Each line is a short fragment. Max 1-2 clauses per line.',
-    '- Use line breaks liberally. One thought per line.',
-    '- NEVER use markdown: no bold, no headers, no bullets.',
-    '- NEVER write long paragraph sentences.',
+    '- Keep it punchy. Short sentences. No walls of text.',
+    '- NEVER use markdown: no bold (**), no headers (#), no code blocks.',
+    '- Use bullet points (•) ONLY inside raid objectives.',
+    '- Twitter handle is @_Qubic_ (with underscores).',
+    '- Always end with @Social Media Booster.',
+    '- Include the post URL inline with 🔗 if provided.',
+    '- Vary the hook style: RAID ALERT, NEW POST LIVE, COMMUNITY ALERT, etc.',
     '- 200 words max.',
-    '- Do NOT include the Thread/URL section in your output. It will be appended automatically.',
-    '- Twitter handle is always @_Qubic_ (with trailing underscore).',
-    '- Invent a unique 🔐 algo secret title each time. Never repeat.',
   ].join('\n');
 
   // Few-shot examples: show the AI exact input→output pairs so it pattern-matches
   const fewShotMessages = [
     {
       role: 'user',
-      content: 'Qubic Oracle Machines are now live. Real-world data feeds into smart contracts verified by 676 Computors. Every query burns QUBIC tokens.\n\nOriginal post URL: https://x.com/Qubic/status/2021638947453943977',
+      content: 'Qubic just dropped the latest Epoch 200 data. CPU miners are profitable. Qubic earns $0.72/day, Monero + Tari $0.58/day. Top Up Bonus 29%.\n\nOriginal post URL: https://x.com/_qubic_/status/2024832523054813476',
     },
     {
       role: 'assistant',
-      content: `🚨 COMMUNITY ALERT: Qubic Oracle Machines are LIVE 🔥\nReal-world data now feeds directly into smart contracts, verified by 676 Computors.\n\nEvery query burns $QUBIC → usage = deflation.\n\n🔐 X Algo Secret (most people miss this):\nIt's not just replies, it's reply timing clusters.\n\nIf 8 to 15 replies hit within a tight 5 to 10 minute window,\nX flags the post as "conversation forming" and expands testing.\n\nSlow trickle = capped reach.\nFast cluster = distribution unlock.\nIf you're engaging, do it now, not later.\n\nTag @_Qubic_ 👇\n$QUBIC #OracleMachines`,
+      content: `RAID ALERT: EPOCH 200 PROFITABILITY REPORT IS LIVE �\nCPU miners, this one is for you.\n\nQubic just dropped the latest Epoch 200 data and the numbers speak loud.\n\n🔗 https://x.com/_qubic_/status/2024832523054813476\n\n🎯 RAID OBJECTIVE\n• Like\n• Repost\n• Drop a sharp comment about Useful PoW\n• Tag a CPU miner\n\nLet's push this beyond the Qubic bubble and into the wider PoW crowd.\n\nTime to show what efficient mining actually looks like. 💪\n@Social Media Booster`,
     },
     {
       role: 'user',
-      content: 'Qubic Oracle Machines launched. 676 Computors verify data. Oracle calls burn QUBIC.\n\nOriginal post URL: https://x.com/Qubic/status/2021638947453943977',
+      content: 'Dogecoin mining is coming to Qubic. Design phase done. Project plan finalized. Two workstreams running in parallel. Target mainnet launch April 1 2026. Qubic already took over Monero network with its miners.\n\nOriginal post URL: https://x.com/_qubic_/status/2024862746517426493',
     },
     {
       role: 'assistant',
-      content: `🚨 Qubic Oracle Machines are LIVE 🔥\n676 Computors verifying real-world data.\nEvery oracle call burns $QUBIC permanently.\n\n🔐 Underused Algo Lever:\n\nBookmarks extend lifespan.\n\nWhen bookmarks spike early,\nX assumes "future reference value"\nand keeps testing the post longer.\n\nMost people ignore this.\nThey shouldn't.\nReply. Quote.\n\nBut also bookmark.\n\nIt quietly extends reach.\n\nTag @_Qubic_ 👇\n$QUBIC`,
+      content: `NEW POST LIVE: DOGECOIN MINING IS COMING TO QUBIC\nDesign phase done. Project plan finalized. Two workstreams running in parallel. Target mainnet launch: April 1, 2026.\n\nQubic already took over the Monero network with its miners. Now Dogecoin is next. Same energy, same infrastructure, more utility. Useful Proof of Work keeps expanding into a universal compute engine.\n\nOne of the biggest communities in crypto is about to meet one of the most undervalued compute networks in the space. This is the kind of post that bridges two worlds.\n\nLet's make sure both of them see it. 🔽\n\nLike. RT. Bookmark. Comment. Quote tweet and tag every DOGE holder and miner you know.\nDon't let it sit quiet. 🤐\n🔗 https://x.com/_qubic_/status/2024862746517426493\n\n@Social Media Booster`,
     },
     {
       role: 'user',
-      content: 'Qubic Oracle Machines are live. Smart contracts plus real-world data. 676 Computors. Each query burns QUBIC.\n\nOriginal post URL: https://x.com/Qubic/status/2021638947453943977',
+      content: 'Qubic All-Hands recap. Neuraxon 2.0 published and running. Oracle Machines live on mainnet with 11000+ queries. DogeCoin ASIC mining architecture locked. Five major milestones shipping in next 60 days.\n\nOriginal post URL: https://x.com/_qubic_/status/2024907910468235582',
     },
     {
       role: 'assistant',
-      content: `🚨 Qubic Oracle Machines are LIVE 🔥\n\nSmart contracts + real-world data.\nVerified by 676 Computors.\nEach query burns $QUBIC.\n\n🔐 The 30-Minute Rule:\nIf meaningful engagement crosses a threshold\nin the first 30 minutes,\nX shifts the post into discovery feeds.\n\nMiss that window,\nand reach compresses.\n\nEarly action compounds.\n\nLate action barely registers.\n\nEngage fast.\n\nTag @_Qubic_ 👇\n$QUBIC`,
+      content: `NEW POST LIVE: QUBIC ALL-HANDS RECAP\nNeuraxon 2.0. AI research. Oracle infrastructure. Mining expansion. Governance. Wallet tooling.\n\nAll moving at the same time, all hitting mainnet in the next 60 days.\nOne All-Hands.\n\nFive major milestones. Every single one of them shipping.\n\nThis is the post that shows what Qubic actually looks like when everything clicks.\n\nLike. RT. Bookmark. Comment. Quote tweet and tag anyone building in AI, mining, or DeFi infrastructure.\n\nDon't let it sit quiet. 🔽\n\n🔗 https://x.com/_qubic_/status/2024907910468235582\n@Social Media Booster`,
     },
   ];
 

@@ -98,10 +98,8 @@ async function postToAnnounceChannels(text, logger, { url } = {}) {
     return 0;
   }
 
-  let finalText = text;
-  if (url) {
-    finalText += `\n\nThread:\n${url}`;
-  }
+  // URL is now included inline by the AI output — no need to append separately
+  const finalText = text;
 
   let posted = 0;
   for (const channelId of targetChannels) {
