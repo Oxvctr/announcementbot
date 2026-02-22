@@ -28,6 +28,10 @@ function getWebhookAuthToken() {
 const DEDUP_WINDOW_MS = 180_000; // 3 minutes
 const recentHashes = new Map(); // hash -> timestamp
 
+// --- Global cooldown: block ALL webhooks for N seconds after one is accepted ---
+const GLOBAL_COOLDOWN_MS = 30_000; // 30 seconds
+let lastWebhookAcceptedAt = 0;
+
 function textHash(text) {
   return createHash('sha256').update(text.trim().toLowerCase()).digest('hex').slice(0, 16);
 }
@@ -116,11 +120,21 @@ function createServer() {
 
     const postUrl = data?.url || data?.post?.url || data?.link || null;
 
+    // Global cooldown: block rapid-fire webhooks regardless of content
+    const now = Date.now();
+    if (now - lastWebhookAcceptedAt < GLOBAL_COOLDOWN_MS) {
+      request.log.warn({ postText: postText.slice(0, 80), cooldownRemaining: GLOBAL_COOLDOWN_MS - (now - lastWebhookAcceptedAt) }, 'webhook blocked by global cooldown');
+      return reply.status(429).send({ error: 'cooldown: another webhook was just processed, try again later' });
+    }
+
     // Dedup: block same source text within 3 min (prevents Zapier double-fire + concurrent race)
     if (isDuplicate(postText)) {
       request.log.warn({ postText: postText.slice(0, 80) }, 'duplicate webhook payload blocked');
       return reply.status(429).send({ error: 'duplicate: same post received within dedup window' });
     }
+
+    // Mark cooldown immediately so concurrent/rapid webhooks are blocked
+    lastWebhookAcceptedAt = Date.now();
 
     // Always store for /draft command
     setLastWebhookPost(postText, postUrl);
