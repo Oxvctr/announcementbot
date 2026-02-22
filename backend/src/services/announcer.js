@@ -34,7 +34,7 @@ export async function generateAnnouncement(topic, styleMemory) {
     '   The subtitle should be a punchy contextual phrase, NOT just the topic name.',
     '   Examples: **COMMUNITY ALERT: THE ENERGY QUESTION EVERY BLOCKCHAIN SHOULD ANSWER** 🔥, **SMART RAID ALERT: CPU MINERS ARE EATING** 🚨, **SIGNAL DROP: FIVE MILESTONES, SIXTY DAYS** ⚡',
     '2) Brief context - 2 to 4 short sentences summarizing the news. Punchy, not paragraphs.',
-    '3) Static CTA line: always include "Like. RT. Bookmark. Comment." plus a context-specific action (tag someone, quote tweet, etc.)',
+    '3) Bold static CTA line: always start with **Like. RT. Bookmark. Comment.** then add a context-specific action (tag someone, quote tweet with a question, etc.). The CTA line MUST be wrapped in **bold**.',
     '4) After the static CTA, add a unique 🧠 **X Algo Tip** section. Pick ONE tip from the list below. NEVER repeat the same tip across posts. Each tip is 3-5 short punchy lines explaining an X algorithm insight.',
     '5) Post link with 🔗 emoji (only if URL provided)',
     '6) @Social Media Booster tag at the end',
@@ -84,7 +84,7 @@ export async function generateAnnouncement(topic, styleMemory) {
     },
     {
       role: 'assistant',
-      content: `**SMART RAID ALERT: CPU MINERS ARE EATING RIGHT NOW** 🚨⛏️\nEpoch 200 profitability data just dropped.\n\nQubic just dropped the latest Epoch 200 data and the numbers speak loud 📈\n\n🔗 https://x.com/_qubic_/status/2024832523054813476\n\nLike. RT. Bookmark. Comment. Drop a sharp take about Useful PoW and tag a CPU miner 👀\n\n🧠 **X Algo Tip — Reply Timing Clusters:**\nX doesn't just count replies. It measures when they land.\nIf 8-15 replies hit within a tight 5-10 minute window, X flags it as "conversation forming" and expands testing 🚀\n\nSlow trickle = capped reach.\nFast cluster = distribution unlock ⚡\nDo it now, not later. That's how you trigger the cluster 💪\n@Social Media Booster`,
+      content: `**SMART RAID ALERT: CPU MINERS ARE EATING RIGHT NOW** 🚨⛏️\nEpoch 200 profitability data just dropped.\n\nQubic just dropped the latest Epoch 200 data and the numbers speak loud 📈\n\n🔗 https://x.com/_qubic_/status/2024832523054813476\n\n**Like. RT. Bookmark. Comment.** Drop a sharp take about Useful PoW and tag a CPU miner 👀\n\n🧠 **X Algo Tip — Reply Timing Clusters:**\nX doesn't just count replies. It measures when they land.\nIf 8-15 replies hit within a tight 5-10 minute window, X flags it as "conversation forming" and expands testing 🚀\n\nSlow trickle = capped reach.\nFast cluster = distribution unlock ⚡\nDo it now, not later. That's how you trigger the cluster 💪\n@Social Media Booster`,
     },
     {
       role: 'user',
@@ -92,7 +92,7 @@ export async function generateAnnouncement(topic, styleMemory) {
     },
     {
       role: 'assistant',
-      content: `**COMMUNITY ALERT: QUBIC IS COMING FOR DOGECOIN** 🚀🐕\nDesign phase done ✅ Project plan finalized ✅ Two workstreams running in parallel.\nTarget mainnet launch: April 1, 2026 📅\n\nQubic already took over the Monero network with its miners ⛏️ Now Dogecoin is next. Same energy, same infrastructure, more utility. Useful Proof of Work keeps expanding into a universal compute engine 🧠\n\nOne of the biggest communities in crypto is about to meet one of the most undervalued compute networks in the space 🔥 This is the kind of post that bridges two worlds.\n\n🔗 https://x.com/_qubic_/status/2024862746517426493\n\nLike. RT. Bookmark. Comment. Quote tweet and tag every DOGE holder and miner you know 📣\n\n🧠 **X Algo Tip — Bookmark Velocity:**\nMost people skip bookmarks. The algorithm doesn't 📌\nWhen bookmarks spike early, X assumes "future reference value" and keeps testing the post longer.\nLikes fade. Bookmarks extend lifespan ⏳\nDon't sleep on it. Bookmark now 🔥\n@Social Media Booster`,
+      content: `**COMMUNITY ALERT: QUBIC IS COMING FOR DOGECOIN** 🚀🐕\nDesign phase done ✅ Project plan finalized ✅ Two workstreams running in parallel.\nTarget mainnet launch: April 1, 2026 📅\n\nQubic already took over the Monero network with its miners ⛏️ Now Dogecoin is next. Same energy, same infrastructure, more utility. Useful Proof of Work keeps expanding into a universal compute engine 🧠\n\nOne of the biggest communities in crypto is about to meet one of the most undervalued compute networks in the space 🔥 This is the kind of post that bridges two worlds.\n\n🔗 https://x.com/_qubic_/status/2024862746517426493\n\n**Like. RT. Bookmark. Comment.** Quote tweet and tag every DOGE holder and miner you know 📣\n\n🧠 **X Algo Tip — Bookmark Velocity:**\nMost people skip bookmarks. The algorithm doesn't 📌\nWhen bookmarks spike early, X assumes "future reference value" and keeps testing the post longer.\nLikes fade. Bookmarks extend lifespan ⏳\nDon't sleep on it. Bookmark now 🔥\n@Social Media Booster`,
     },
     {
       role: 'user',
@@ -100,7 +100,7 @@ export async function generateAnnouncement(topic, styleMemory) {
     },
     {
       role: 'assistant',
-      content: `**SIGNAL DROP: FIVE MILESTONES, SIXTY DAYS** 📢⚡\nNeuraxon 2.0 🧠 AI research 🔥 Oracle infrastructure 🔮 Mining expansion ⛏️ Governance 🏛️ Wallet tooling 🛠️\n\nAll moving at the same time, all hitting mainnet in the next 60 days 🚀\nOne All-Hands. Five major milestones. Every single one of them shipping ✅\n\nThis is the post that shows what Qubic actually looks like when everything clicks 💪\n\n🔗 https://x.com/_qubic_/status/2024907910468235582\n\nLike. RT. Bookmark. Comment. Quote tweet and tag anyone building in AI, mining, or DeFi infrastructure 📣\n\n🧠 **X Algo Tip — The First 30 Minutes:**\nIf meaningful engagement crosses a threshold in the first 30 minutes, X shifts the post into discovery feeds 📈\nMiss that window and reach compresses hard.\nEarly action compounds. Late action barely registers ⏰\nEngage now. Not later. That's the unlock 🔓\n@Social Media Booster`,
+      content: `**SIGNAL DROP: FIVE MILESTONES, SIXTY DAYS** 📢⚡\nNeuraxon 2.0 🧠 AI research 🔥 Oracle infrastructure 🔮 Mining expansion ⛏️ Governance 🏛️ Wallet tooling 🛠️\n\nAll moving at the same time, all hitting mainnet in the next 60 days 🚀\nOne All-Hands. Five major milestones. Every single one of them shipping ✅\n\nThis is the post that shows what Qubic actually looks like when everything clicks 💪\n\n🔗 https://x.com/_qubic_/status/2024907910468235582\n\n**Like. RT. Bookmark. Comment.** Quote tweet and tag anyone building in AI, mining, or DeFi infrastructure 📣\n\n🧠 **X Algo Tip — The First 30 Minutes:**\nIf meaningful engagement crosses a threshold in the first 30 minutes, X shifts the post into discovery feeds 📈\nMiss that window and reach compresses hard.\nEarly action compounds. Late action barely registers ⏰\nEngage now. Not later. That's the unlock 🔓\n@Social Media Booster`,
     },
   ];
 
