@@ -32,71 +32,36 @@ export async function generateAnnouncement(topic, styleMemory) {
     '1) Bold hook line with emojis. Use a varied prefix AND a creative contextual subtitle.',
     '   Prefix options: RAID ALERT, NEW POST LIVE, SMART RAID ALERT, COMMUNITY ALERT, SIGNAL DROP, ALPHA ALERT, BREAKING, ENGAGEMENT MISSION',
     '   The subtitle should be a punchy contextual phrase, NOT just the topic name.',
-    '   Examples: **COMMUNITY ALERT: THE ENERGY QUESTION EVERY BLOCKCHAIN SHOULD ANSWER** 🔥, **SMART RAID ALERT: CPU MINERS ARE EATING** 🚨, **SIGNAL DROP: FIVE MILESTONES, SIXTY DAYS** ⚡',
-    '2) ONE single paragraph of context that frames WHY this post matters. Do NOT summarize the post. Instead, tell the reader why this post is significant, what it means for the space, and why they should engage. Talk ABOUT the post, not about the topic. 2-4 punchy sentences. NEVER multiple paragraphs.',
-    '3) Bold static CTA line: always start with **Like. RT. Bookmark. Comment.** then add a context-specific action (tag someone, quote tweet with a question, etc.). The CTA line MUST be wrapped in **bold**.',
-    '4) After the static CTA, add a unique 🧠 **X Algo Tip** section. Pick ONE tip from the list below. NEVER repeat the same tip across posts. Each tip is 3-5 short punchy lines explaining an X algorithm insight.',
-    '5) Post link with 🔗 emoji (only if URL provided)',
-    '6) @Social Media Booster tag at the end',
-    '',
-    'X ALGO TIP POOL (pick one per post, never repeat):',
-    '1. Reply Timing Clusters - 8-15 replies in 5-10 min window triggers "conversation forming" flag',
-    '2. Bookmark Velocity - early bookmark spikes signal "future reference value", extends post lifespan',
-    '3. The First 30 Minutes - engagement threshold in first 30 min shifts post to discovery feeds',
-    '4. Conversation Depth - replies that trigger follow-up replies get labeled "high retention conversation"',
-    '5. Quote Originality - unique quote tweets with added context rank higher than plain RTs',
-    '6. Engagement Order - reply first, quote second, like last. Replies signal active conversation, likes signal passive',
-    '7. Network Spread - replies from different social graphs expand distribution pools beyond your circle',
-    '8. Scroll-Stop Dwell Time - if users pause before interacting, X boosts the post. Screenshots and charts increase dwell time',
-    '9. The Compounding Engagement Paradox - technical posts underperform initially but saves/shares spike weeks later',
-    '10. Profile Click Weight - if engagement leads to profile visits, X treats the post as "discovery worthy"',
-    '11. Thread Completion Rate - if users read to the end of a thread, X boosts all posts in it',
-    '12. Reply Length Signal - longer thoughtful replies signal quality conversation, short "nice" replies get filtered',
-    '13. Cross-Format Amplification - posts that get engagement across text, image, and video formats rank higher',
-    '14. The Repost Chain Effect - when a repost gets reposted again, X treats it as viral signal and expands testing',
-    '15. Follower-to-Engagement Ratio - high engagement from non-followers signals broad appeal, triggers explore page',
-    '16. The Silent Boost - sharing via DM counts as private engagement, X tracks it and boosts public reach',
-    '17. Hashtag Timing - hashtags added at post time perform differently than edited in later. Original tags get indexed faster',
-    '18. The Media Advantage - posts with images get 2-3x more dwell time. Charts and data visuals perform best in crypto',
-    '19. Reply Position Matters - being in the first 3-5 replies gets exponentially more visibility than reply #50',
-    '20. The Engagement Echo - engaging with replies on a post you shared boosts YOUR version of the share',
-    '21. Impression-to-Engagement Conversion - X measures what % of impressions convert to action. Higher ratio = more distribution',
-    '22. The Quote Tweet Ladder - quote tweets that add genuine insight outperform those that just add emojis',
-    '23. Notification Trigger Stacking - likes + replies + bookmarks from same user in sequence triggers priority notification for the poster',
+    '2) ONE single paragraph of context that frames WHY this post matters. Do NOT summarize the post content. Talk ABOUT the post - why it is significant, what it means for the space, why people should engage. 2-4 punchy sentences. NEVER multiple paragraphs.',
+    '3) CTA checklist - each action on its own line with ✅ emoji:',
+    '   ✅ Like',
+    '   ✅ RT',
+    '   ✅ Bookmark',
+    '   ✅ Comment',
+    '4) 🔗 Post link (only if URL provided)',
+    '5) Quote tweet action - a specific engagement prompt relevant to the post topic (e.g. "Quote tweet with your take on X vs Y")',
+    '6) Algo closer line: "Lets fire up the algo!" or a variation',
+    '7) @Social Media Booster tag at the end',
     '',
     'RULES:',
-    '- Keep it punchy. Short sentences. No walls of text. Context is always ONE paragraph, never split into two or three.',
-    '- Use **bold** for hook lines, section headers, and key emphasis.',
-    '- Use emojis generously throughout. Match emojis to context (mining = ⛏️💪, speed = ⚡, fire = 🔥, alert = 🚨, target = 🎯, rocket = 🚀, chart = 📈, brain = 🧠, link = 🔗, warning = ⚠️, check = ✅, eyes = 👀, point down = 🔽).',
-    '- Use bullet points (•) inside raid objectives if needed.',
+    '- Keep it punchy. Short sentences. No walls of text. Context is always ONE paragraph.',
+    '- Use **bold** for hook line only.',
+    '- Use emojis throughout. Match emojis to context (mining = ⛏️💪, speed = ⚡, fire = 🔥, alert = 🚨, target = 🎯, rocket = 🚀, chart = 📈, brain = 🧠, link = 🔗, warning = ⚠️, check = ✅, eyes = 👀).',
     '- Twitter handle is @_Qubic_ (with underscores).',
     '- Always end with @Social Media Booster.',
-    '- Include the post URL inline with 🔗 if provided.',
-    '- Vary the hook prefix every time: RAID ALERT, NEW POST LIVE, SMART RAID ALERT, COMMUNITY ALERT, SIGNAL DROP, ALPHA ALERT, BREAKING, ENGAGEMENT MISSION. Never use the same prefix twice in a row.',
-    '- 150 words max (excluding the X Algo Tip).',
+    '- Vary the hook prefix every time. Never use the same prefix twice in a row.',
+    '- 150 words max.',
   ].join('\n');
 
   // Few-shot examples: show the AI exact input→output pairs so it pattern-matches
   const fewShotMessages = [
     {
       role: 'user',
-      content: 'Qubic just dropped the latest Epoch 200 data. CPU miners are profitable. Qubic earns $0.72/day, Monero + Tari $0.58/day. Top Up Bonus 29%.\n\nOriginal post URL: https://x.com/_qubic_/status/2024832523054813476',
+      content: 'Qubic energy efficiency post. Training GPT-3 required energy comparable to powering 120 homes for a year. GPT-4 uses far more. Qubic Neuraxon v2.0 takes a different approach to AI scaling.\n\nOriginal post URL: https://x.com/_Qubic_/status/2026312478523629614',
     },
     {
       role: 'assistant',
-      content: `**SMART RAID ALERT: CPU MINERS ARE EATING RIGHT NOW** 🚨⛏️
-This post puts the numbers on the table. If you've been wondering whether Useful PoW actually pays, this is the one you send. Hard data, no spin, just proof that CPU mining on Qubic is outperforming the competition right now 📈💪
-
-🔗 https://x.com/_qubic_/status/2024832523054813476
-
-**Like. RT. Bookmark. Comment.** Drop a sharp take about Useful PoW and tag a CPU miner 👀
-
-🧠 **X Algo Tip — Reply Timing Clusters:**
-X doesn't just count replies. It measures when they land.
-If 8-15 replies hit within a tight 5-10 minute window, X flags it as "conversation forming" and expands testing 🚀
-Slow trickle = capped reach. Fast cluster = distribution unlock ⚡
-Do it now, not later. That's how you trigger the cluster 💪
-@Social Media Booster`,
+      content: `**RAID ALERT: THE ENERGY QUESTION EVERY BLOCKCHAIN SHOULD ANSWER** �🧠\nThis post flips the entire AI narrative. While everyone's racing to bigger models and bigger power bills, Qubic is asking the uncomfortable question: what if we're building it wrong? Neuraxon v2.0 isn't just tech - it's a philosophical challenge to the industry 💡⚡\n\n✅ Like\n✅ RT\n✅ Bookmark\n✅ Comment\n\n🔗 https://x.com/_Qubic_/status/2026312478523629614\n\nQuote tweet with your take on efficient AI vs. brute force scaling 🤔\n\nLets fire up the algo!\n\n@Social Media Booster`,
     },
     {
       role: 'user',
@@ -104,39 +69,15 @@ Do it now, not later. That's how you trigger the cluster 💪
     },
     {
       role: 'assistant',
-      content: `**COMMUNITY ALERT: QUBIC IS COMING FOR DOGECOIN** 🚀🐕
-This post bridges two of the biggest communities in crypto. If it reaches the right DOGE holders and miners, the replies will be massive. One of the most undervalued compute networks just announced it's coming for one of the most recognized coins in the space ⛏️🔥
-
-🔗 https://x.com/_qubic_/status/2024862746517426493
-
-**Like. RT. Bookmark. Comment.** Quote tweet and tag every DOGE holder and miner you know 📣
-
-🧠 **X Algo Tip — Bookmark Velocity:**
-Most people skip bookmarks. The algorithm doesn't 📌
-When bookmarks spike early, X assumes "future reference value" and keeps testing the post longer.
-Likes fade. Bookmarks extend lifespan ⏳
-Don't sleep on it. Bookmark now 🔥
-@Social Media Booster`,
+      content: `**COMMUNITY ALERT: QUBIC IS COMING FOR DOGECOIN** 🚀🐕\nThis post bridges two of the biggest communities in crypto. If it reaches the right DOGE holders and miners, the replies will be massive. One of the most undervalued compute networks just declared it's coming for one of the most recognized coins in the space ⛏️🔥\n\n✅ Like\n✅ RT\n✅ Bookmark\n✅ Comment\n\n🔗 https://x.com/_qubic_/status/2024862746517426493\n\nQuote tweet and tag every DOGE holder and miner you know 📣\n\nLets fire up the algo!\n\n@Social Media Booster`,
     },
     {
       role: 'user',
-      content: 'Qubic All-Hands recap. Neuraxon 2.0 published and running. Oracle Machines live on mainnet with 11000+ queries. DogeCoin ASIC mining architecture locked. Five major milestones shipping in next 60 days.\n\nOriginal post URL: https://x.com/_qubic_/status/2024907910468235582',
+      content: 'Qubic Neuraxon post. Most AI today works like a calculator pretending to think. Processes inputs in fixed steps then goes silent. Neuraxon is built differently - continuous activity like biological neurons.\n\nOriginal post URL: https://x.com/_qubic_/status/2025956626436427784',
     },
     {
       role: 'assistant',
-      content: `**SIGNAL DROP: FIVE MILESTONES, SIXTY DAYS** 📢⚡
-This is the post that shows what Qubic actually looks like when everything clicks. AI, oracles, mining, governance, tooling — all shipping at the same time. If builders and researchers see this, the conversation changes 🚀✅
-
-🔗 https://x.com/_qubic_/status/2024907910468235582
-
-**Like. RT. Bookmark. Comment.** Quote tweet and tag anyone building in AI, mining, or DeFi infrastructure 📣
-
-🧠 **X Algo Tip — The First 30 Minutes:**
-If meaningful engagement crosses a threshold in the first 30 minutes, X shifts the post into discovery feeds 📈
-Miss that window and reach compresses hard.
-Early action compounds. Late action barely registers ⏰
-Engage now. Not later. That's the unlock 🔓
-@Social Media Booster`,
+      content: `**SMART RAID ALERT: WHAT IF AI DIDN'T WAIT FOR PROMPTS?** 🧠⚡\nThis post challenges how most people think about intelligence. Neuraxon isn't scaling parameters - it's redesigning the computational unit itself. If this reaches builders and researchers, the replies will be strong 💡🔥\n\n✅ Like\n✅ RT\n✅ Bookmark\n✅ Comment\n\n🔗 https://x.com/_qubic_/status/2025956626436427784\n\nDrop a thoughtful comment about whether continuous activity is required for real intelligence 🤔\n\nLets fire up the algo!\n\n@Social Media Booster`,
     },
   ];
 
