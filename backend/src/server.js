@@ -54,6 +54,14 @@ function releaseHash(text) {
   recentHashes.delete(textHash(text));
 }
 
+// --- X/Twitter URL gate: only accept webhooks with a valid X post link ---
+const X_URL_PATTERN = /https?:\/\/(x\.com|twitter\.com)\/[^\s]+/i;
+
+function hasValidXUrl(url) {
+  if (!url) return false;
+  return X_URL_PATTERN.test(url);
+}
+
 function createServer() {
   const app = Fastify({ logger: process.env.NODE_ENV !== 'test' });
 
@@ -119,6 +127,12 @@ function createServer() {
     }
 
     const postUrl = data?.url || data?.post?.url || data?.link || null;
+
+    // X/Twitter URL gate: only process webhooks that include a valid X post link
+    if (!hasValidXUrl(postUrl)) {
+      request.log.warn({ postUrl, postText: postText.slice(0, 80) }, 'webhook rejected: no valid X/Twitter URL');
+      return reply.status(400).send({ error: 'rejected: webhook must include a valid x.com or twitter.com URL' });
+    }
 
     // Global cooldown: block rapid-fire webhooks regardless of content
     const now = Date.now();
