@@ -33,7 +33,7 @@ export async function generateAnnouncement(topic, styleMemory) {
     '   Prefix options: RAID ALERT, NEW POST LIVE, SMART RAID ALERT, COMMUNITY ALERT, SIGNAL DROP, ALPHA ALERT, BREAKING, ENGAGEMENT MISSION',
     '   The subtitle should be a punchy contextual phrase, NOT just the topic name.',
     '   Examples: **COMMUNITY ALERT: THE ENERGY QUESTION EVERY BLOCKCHAIN SHOULD ANSWER** 🔥, **SMART RAID ALERT: CPU MINERS ARE EATING** 🚨, **SIGNAL DROP: FIVE MILESTONES, SIXTY DAYS** ⚡',
-    '2) ONE single paragraph of context - 2 to 4 punchy sentences. NEVER write multiple paragraphs. All context goes in one block.',
+    '2) ONE single paragraph of context that frames WHY this post matters. Do NOT summarize the post. Instead, tell the reader why this post is significant, what it means for the space, and why they should engage. Talk ABOUT the post, not about the topic. 2-4 punchy sentences. NEVER multiple paragraphs.',
     '3) Bold static CTA line: always start with **Like. RT. Bookmark. Comment.** then add a context-specific action (tag someone, quote tweet with a question, etc.). The CTA line MUST be wrapped in **bold**.',
     '4) After the static CTA, add a unique 🧠 **X Algo Tip** section. Pick ONE tip from the list below. NEVER repeat the same tip across posts. Each tip is 3-5 short punchy lines explaining an X algorithm insight.',
     '5) Post link with 🔗 emoji (only if URL provided)',
@@ -85,9 +85,9 @@ export async function generateAnnouncement(topic, styleMemory) {
     {
       role: 'assistant',
       content: `**SMART RAID ALERT: CPU MINERS ARE EATING RIGHT NOW** 🚨⛏️
-Epoch 200 profitability report is live. Qubic earns $0.72/day vs Monero + Tari at $0.58/day with a 29% Top Up Bonus. CPU miners are winning and the data proves it 📈💪
+This post puts the numbers on the table. If you've been wondering whether Useful PoW actually pays, this is the one you send. Hard data, no spin, just proof that CPU mining on Qubic is outperforming the competition right now 📈💪
 
-� https://x.com/_qubic_/status/2024832523054813476
+🔗 https://x.com/_qubic_/status/2024832523054813476
 
 **Like. RT. Bookmark. Comment.** Drop a sharp take about Useful PoW and tag a CPU miner 👀
 
@@ -105,7 +105,7 @@ Do it now, not later. That's how you trigger the cluster 💪
     {
       role: 'assistant',
       content: `**COMMUNITY ALERT: QUBIC IS COMING FOR DOGECOIN** 🚀🐕
-Dogecoin mining on Qubic is official. Design phase done, project plan finalized, two workstreams running in parallel. Mainnet target: April 1, 2026 📅 Qubic already took over Monero's network — now DOGE is next ⛏️🔥
+This post bridges two of the biggest communities in crypto. If it reaches the right DOGE holders and miners, the replies will be massive. One of the most undervalued compute networks just announced it's coming for one of the most recognized coins in the space ⛏️🔥
 
 🔗 https://x.com/_qubic_/status/2024862746517426493
 
@@ -125,7 +125,7 @@ Don't sleep on it. Bookmark now 🔥
     {
       role: 'assistant',
       content: `**SIGNAL DROP: FIVE MILESTONES, SIXTY DAYS** 📢⚡
-Qubic All-Hands just wrapped. Neuraxon 2.0 live 🧠 Oracle Machines on mainnet with 11K+ queries 🔮 DogeCoin ASIC architecture locked ⛏️ Five major milestones all shipping in the next 60 days 🚀✅
+This is the post that shows what Qubic actually looks like when everything clicks. AI, oracles, mining, governance, tooling — all shipping at the same time. If builders and researchers see this, the conversation changes 🚀✅
 
 🔗 https://x.com/_qubic_/status/2024907910468235582
 
