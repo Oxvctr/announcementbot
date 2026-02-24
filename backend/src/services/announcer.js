@@ -33,7 +33,7 @@ export async function generateAnnouncement(topic, styleMemory) {
     '   Prefix options: RAID ALERT, NEW POST LIVE, SMART RAID ALERT, COMMUNITY ALERT, SIGNAL DROP, ALPHA ALERT, BREAKING, ENGAGEMENT MISSION',
     '   The subtitle should be a punchy contextual phrase, NOT just the topic name.',
     '   Examples: **COMMUNITY ALERT: THE ENERGY QUESTION EVERY BLOCKCHAIN SHOULD ANSWER** 🔥, **SMART RAID ALERT: CPU MINERS ARE EATING** 🚨, **SIGNAL DROP: FIVE MILESTONES, SIXTY DAYS** ⚡',
-    '2) Brief context - 2 to 4 short sentences summarizing the news. Punchy, not paragraphs.',
+    '2) ONE single paragraph of context - 2 to 4 punchy sentences. NEVER write multiple paragraphs. All context goes in one block.',
     '3) Bold static CTA line: always start with **Like. RT. Bookmark. Comment.** then add a context-specific action (tag someone, quote tweet with a question, etc.). The CTA line MUST be wrapped in **bold**.',
     '4) After the static CTA, add a unique 🧠 **X Algo Tip** section. Pick ONE tip from the list below. NEVER repeat the same tip across posts. Each tip is 3-5 short punchy lines explaining an X algorithm insight.',
     '5) Post link with 🔗 emoji (only if URL provided)',
@@ -65,7 +65,7 @@ export async function generateAnnouncement(topic, styleMemory) {
     '23. Notification Trigger Stacking - likes + replies + bookmarks from same user in sequence triggers priority notification for the poster',
     '',
     'RULES:',
-    '- Keep it punchy. Short sentences. No walls of text.',
+    '- Keep it punchy. Short sentences. No walls of text. Context is always ONE paragraph, never split into two or three.',
     '- Use **bold** for hook lines, section headers, and key emphasis.',
     '- Use emojis generously throughout. Match emojis to context (mining = ⛏️💪, speed = ⚡, fire = 🔥, alert = 🚨, target = 🎯, rocket = 🚀, chart = 📈, brain = 🧠, link = 🔗, warning = ⚠️, check = ✅, eyes = 👀, point down = 🔽).',
     '- Use bullet points (•) inside raid objectives if needed.',
@@ -73,7 +73,7 @@ export async function generateAnnouncement(topic, styleMemory) {
     '- Always end with @Social Media Booster.',
     '- Include the post URL inline with 🔗 if provided.',
     '- Vary the hook prefix every time: RAID ALERT, NEW POST LIVE, SMART RAID ALERT, COMMUNITY ALERT, SIGNAL DROP, ALPHA ALERT, BREAKING, ENGAGEMENT MISSION. Never use the same prefix twice in a row.',
-    '- 250 words max.',
+    '- 150 words max (excluding the X Algo Tip).',
   ].join('\n');
 
   // Few-shot examples: show the AI exact input→output pairs so it pattern-matches
@@ -84,7 +84,19 @@ export async function generateAnnouncement(topic, styleMemory) {
     },
     {
       role: 'assistant',
-      content: `**SMART RAID ALERT: CPU MINERS ARE EATING RIGHT NOW** 🚨⛏️\nEpoch 200 profitability data just dropped.\n\nQubic just dropped the latest Epoch 200 data and the numbers speak loud 📈\n\n🔗 https://x.com/_qubic_/status/2024832523054813476\n\n**Like. RT. Bookmark. Comment.** Drop a sharp take about Useful PoW and tag a CPU miner 👀\n\n🧠 **X Algo Tip — Reply Timing Clusters:**\nX doesn't just count replies. It measures when they land.\nIf 8-15 replies hit within a tight 5-10 minute window, X flags it as "conversation forming" and expands testing 🚀\n\nSlow trickle = capped reach.\nFast cluster = distribution unlock ⚡\nDo it now, not later. That's how you trigger the cluster 💪\n@Social Media Booster`,
+      content: `**SMART RAID ALERT: CPU MINERS ARE EATING RIGHT NOW** 🚨⛏️
+Epoch 200 profitability report is live. Qubic earns $0.72/day vs Monero + Tari at $0.58/day with a 29% Top Up Bonus. CPU miners are winning and the data proves it 📈💪
+
+� https://x.com/_qubic_/status/2024832523054813476
+
+**Like. RT. Bookmark. Comment.** Drop a sharp take about Useful PoW and tag a CPU miner 👀
+
+🧠 **X Algo Tip — Reply Timing Clusters:**
+X doesn't just count replies. It measures when they land.
+If 8-15 replies hit within a tight 5-10 minute window, X flags it as "conversation forming" and expands testing 🚀
+Slow trickle = capped reach. Fast cluster = distribution unlock ⚡
+Do it now, not later. That's how you trigger the cluster 💪
+@Social Media Booster`,
     },
     {
       role: 'user',
@@ -92,7 +104,19 @@ export async function generateAnnouncement(topic, styleMemory) {
     },
     {
       role: 'assistant',
-      content: `**COMMUNITY ALERT: QUBIC IS COMING FOR DOGECOIN** 🚀🐕\nDesign phase done ✅ Project plan finalized ✅ Two workstreams running in parallel.\nTarget mainnet launch: April 1, 2026 📅\n\nQubic already took over the Monero network with its miners ⛏️ Now Dogecoin is next. Same energy, same infrastructure, more utility. Useful Proof of Work keeps expanding into a universal compute engine 🧠\n\nOne of the biggest communities in crypto is about to meet one of the most undervalued compute networks in the space 🔥 This is the kind of post that bridges two worlds.\n\n🔗 https://x.com/_qubic_/status/2024862746517426493\n\n**Like. RT. Bookmark. Comment.** Quote tweet and tag every DOGE holder and miner you know 📣\n\n🧠 **X Algo Tip — Bookmark Velocity:**\nMost people skip bookmarks. The algorithm doesn't 📌\nWhen bookmarks spike early, X assumes "future reference value" and keeps testing the post longer.\nLikes fade. Bookmarks extend lifespan ⏳\nDon't sleep on it. Bookmark now 🔥\n@Social Media Booster`,
+      content: `**COMMUNITY ALERT: QUBIC IS COMING FOR DOGECOIN** 🚀🐕
+Dogecoin mining on Qubic is official. Design phase done, project plan finalized, two workstreams running in parallel. Mainnet target: April 1, 2026 📅 Qubic already took over Monero's network — now DOGE is next ⛏️🔥
+
+🔗 https://x.com/_qubic_/status/2024862746517426493
+
+**Like. RT. Bookmark. Comment.** Quote tweet and tag every DOGE holder and miner you know 📣
+
+🧠 **X Algo Tip — Bookmark Velocity:**
+Most people skip bookmarks. The algorithm doesn't 📌
+When bookmarks spike early, X assumes "future reference value" and keeps testing the post longer.
+Likes fade. Bookmarks extend lifespan ⏳
+Don't sleep on it. Bookmark now 🔥
+@Social Media Booster`,
     },
     {
       role: 'user',
@@ -100,7 +124,19 @@ export async function generateAnnouncement(topic, styleMemory) {
     },
     {
       role: 'assistant',
-      content: `**SIGNAL DROP: FIVE MILESTONES, SIXTY DAYS** 📢⚡\nNeuraxon 2.0 🧠 AI research 🔥 Oracle infrastructure 🔮 Mining expansion ⛏️ Governance 🏛️ Wallet tooling 🛠️\n\nAll moving at the same time, all hitting mainnet in the next 60 days 🚀\nOne All-Hands. Five major milestones. Every single one of them shipping ✅\n\nThis is the post that shows what Qubic actually looks like when everything clicks 💪\n\n🔗 https://x.com/_qubic_/status/2024907910468235582\n\n**Like. RT. Bookmark. Comment.** Quote tweet and tag anyone building in AI, mining, or DeFi infrastructure 📣\n\n🧠 **X Algo Tip — The First 30 Minutes:**\nIf meaningful engagement crosses a threshold in the first 30 minutes, X shifts the post into discovery feeds 📈\nMiss that window and reach compresses hard.\nEarly action compounds. Late action barely registers ⏰\nEngage now. Not later. That's the unlock 🔓\n@Social Media Booster`,
+      content: `**SIGNAL DROP: FIVE MILESTONES, SIXTY DAYS** 📢⚡
+Qubic All-Hands just wrapped. Neuraxon 2.0 live 🧠 Oracle Machines on mainnet with 11K+ queries 🔮 DogeCoin ASIC architecture locked ⛏️ Five major milestones all shipping in the next 60 days 🚀✅
+
+🔗 https://x.com/_qubic_/status/2024907910468235582
+
+**Like. RT. Bookmark. Comment.** Quote tweet and tag anyone building in AI, mining, or DeFi infrastructure 📣
+
+🧠 **X Algo Tip — The First 30 Minutes:**
+If meaningful engagement crosses a threshold in the first 30 minutes, X shifts the post into discovery feeds 📈
+Miss that window and reach compresses hard.
+Early action compounds. Late action barely registers ⏰
+Engage now. Not later. That's the unlock 🔓
+@Social Media Booster`,
     },
   ];
 
