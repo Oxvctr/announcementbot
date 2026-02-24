@@ -33,11 +33,11 @@ export async function generateAnnouncement(topic, styleMemory) {
     '   Prefix options: RAID ALERT, NEW POST LIVE, SMART RAID ALERT, COMMUNITY ALERT, SIGNAL DROP, ALPHA ALERT, BREAKING, ENGAGEMENT MISSION',
     '   The subtitle should be a punchy contextual phrase, NOT just the topic name.',
     '2) ONE single paragraph of context that frames WHY this post matters. Do NOT summarize the post content. Talk ABOUT the post - why it is significant, what it means for the space, why people should engage. 2-4 punchy sentences. NEVER multiple paragraphs.',
-    '3) CTA checklist - each action on its own line with ✅ emoji:',
-    '   ✅ Like',
-    '   ✅ RT',
-    '   ✅ Bookmark',
-    '   ✅ Comment',
+    '3) CTA checklist - each action on its own line with ✅ emoji, text in **bold**:',
+    '   ✅ **Like**',
+    '   ✅ **RT**',
+    '   ✅ **Bookmark**',
+    '   ✅ **Comment**',
     '4) 🔗 Post link (only if URL provided)',
     '5) Quote tweet action - a specific engagement prompt relevant to the post topic (e.g. "Quote tweet with your take on X vs Y")',
     '6) Algo closer line: "Lets fire up the algo!" or a variation',
@@ -45,7 +45,7 @@ export async function generateAnnouncement(topic, styleMemory) {
     '',
     'RULES:',
     '- Keep it punchy. Short sentences. No walls of text. Context is always ONE paragraph.',
-    '- Use **bold** for hook line only.',
+    '- Use **bold** for hook line and CTA checklist items.',
     '- Use emojis throughout. Match emojis to context (mining = ⛏️💪, speed = ⚡, fire = 🔥, alert = 🚨, target = 🎯, rocket = 🚀, chart = 📈, brain = 🧠, link = 🔗, warning = ⚠️, check = ✅, eyes = 👀).',
     '- Twitter handle is @_Qubic_ (with underscores).',
     '- Always end with @Social Media Booster.',
@@ -61,7 +61,7 @@ export async function generateAnnouncement(topic, styleMemory) {
     },
     {
       role: 'assistant',
-      content: `**RAID ALERT: THE ENERGY QUESTION EVERY BLOCKCHAIN SHOULD ANSWER** �🧠\nThis post flips the entire AI narrative. While everyone's racing to bigger models and bigger power bills, Qubic is asking the uncomfortable question: what if we're building it wrong? Neuraxon v2.0 isn't just tech - it's a philosophical challenge to the industry 💡⚡\n\n✅ Like\n✅ RT\n✅ Bookmark\n✅ Comment\n\n🔗 https://x.com/_Qubic_/status/2026312478523629614\n\nQuote tweet with your take on efficient AI vs. brute force scaling 🤔\n\nLets fire up the algo!\n\n@Social Media Booster`,
+      content: `**RAID ALERT: THE ENERGY QUESTION EVERY BLOCKCHAIN SHOULD ANSWER** 🔥🧠\nThis post flips the entire AI narrative. While everyone's racing to bigger models and bigger power bills, Qubic is asking the uncomfortable question: what if we're building it wrong? Neuraxon v2.0 isn't just tech - it's a philosophical challenge to the industry 💡⚡\n\n✅ **Like**\n✅ **RT**\n✅ **Bookmark**\n✅ **Comment**\n\n🔗 https://x.com/_Qubic_/status/2026312478523629614\n\nQuote tweet with your take on efficient AI vs. brute force scaling 🤔\n\nLets fire up the algo!\n\n@Social Media Booster`,
     },
     {
       role: 'user',
@@ -69,7 +69,7 @@ export async function generateAnnouncement(topic, styleMemory) {
     },
     {
       role: 'assistant',
-      content: `**COMMUNITY ALERT: QUBIC IS COMING FOR DOGECOIN** 🚀🐕\nThis post bridges two of the biggest communities in crypto. If it reaches the right DOGE holders and miners, the replies will be massive. One of the most undervalued compute networks just declared it's coming for one of the most recognized coins in the space ⛏️🔥\n\n✅ Like\n✅ RT\n✅ Bookmark\n✅ Comment\n\n🔗 https://x.com/_qubic_/status/2024862746517426493\n\nQuote tweet and tag every DOGE holder and miner you know 📣\n\nLets fire up the algo!\n\n@Social Media Booster`,
+      content: `**COMMUNITY ALERT: QUBIC IS COMING FOR DOGECOIN** 🚀🐕\nThis post bridges two of the biggest communities in crypto. If it reaches the right DOGE holders and miners, the replies will be massive. One of the most undervalued compute networks just declared it's coming for one of the most recognized coins in the space ⛏️🔥\n\n✅ **Like**\n✅ **RT**\n✅ **Bookmark**\n✅ **Comment**\n\n🔗 https://x.com/_qubic_/status/2024862746517426493\n\nQuote tweet and tag every DOGE holder and miner you know 📣\n\nLets fire up the algo!\n\n@Social Media Booster`,
     },
     {
       role: 'user',
@@ -77,7 +77,7 @@ export async function generateAnnouncement(topic, styleMemory) {
     },
     {
       role: 'assistant',
-      content: `**SMART RAID ALERT: WHAT IF AI DIDN'T WAIT FOR PROMPTS?** 🧠⚡\nThis post challenges how most people think about intelligence. Neuraxon isn't scaling parameters - it's redesigning the computational unit itself. If this reaches builders and researchers, the replies will be strong 💡🔥\n\n✅ Like\n✅ RT\n✅ Bookmark\n✅ Comment\n\n🔗 https://x.com/_qubic_/status/2025956626436427784\n\nDrop a thoughtful comment about whether continuous activity is required for real intelligence 🤔\n\nLets fire up the algo!\n\n@Social Media Booster`,
+      content: `**SMART RAID ALERT: WHAT IF AI DIDN'T WAIT FOR PROMPTS?** 🧠⚡\nThis post challenges how most people think about intelligence. Neuraxon isn't scaling parameters - it's redesigning the computational unit itself. If this reaches builders and researchers, the replies will be strong 💡🔥\n\n✅ **Like**\n✅ **RT**\n✅ **Bookmark**\n✅ **Comment**\n\n🔗 https://x.com/_qubic_/status/2025956626436427784\n\nDrop a thoughtful comment about whether continuous activity is required for real intelligence 🤔\n\nLets fire up the algo!\n\n@Social Media Booster`,
     },
   ];
 
