@@ -187,6 +187,9 @@ async function registerSlashCommands(bot, logger) {
         await rest.put(Routes.applicationGuildCommands(bot.user.id, guildId), { body: SLASH_COMMANDS });
         logger?.info?.({ commands: SLASH_COMMANDS.length, guildId }, 'guild slash commands registered (instant)');
       }
+      // Clear stale global commands to prevent duplicates
+      await rest.put(Routes.applicationCommands(bot.user.id), { body: [] });
+      logger?.info?.('cleared global commands (using guild-scoped registration)');
     } else {
       await rest.put(Routes.applicationCommands(bot.user.id), { body: SLASH_COMMANDS });
       logger?.info?.({ commands: SLASH_COMMANDS.length }, 'global slash commands registered (may take up to 1hr)');
